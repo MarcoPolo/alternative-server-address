@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-10-19T00:04:32.611017+00:00",
+  "timestamp": "2025-11-16T00:04:26.681717+00:00",
   "repo": "MarcoPolo/new-preferred-address",
   "labels": [
     {
@@ -79,6 +79,38 @@
       "body": "from Ted Hardie from the mailing list:\n\n> You are providing this as a proposed structure:\n> \n> NEW_PREFERRED_ADDRESS Frame {\n>      Type (i) = 0x1d5845e2,\n>      Sequence Number (i),\n>      IPv4 Address (32),\n>      IPv4 Port (16),\n>      IPv6 Address (128),\n>      IPv6 Port (16),\n>    }\n> \n> Where there do not appear to be any restrictions on IPv6 address family or\n> IPv4 reachability.  In the previous use case,there was a general reliance\n> on the server either having public address space to supply or a way to\n> confirm that the client was within the same administrative boundary and\n> thus could use restricted space (like RFC 1918 or ULA space).  In a peer to\n> peer setting, reachability may be more difficult to confirm without\n> additional mechanisms (perhaps analogous to the SIP selection process).\n> Each of those has its own consequences for the performance and security\n> properties.\n> \n> If you plan to use this in a context where this is not an issue, describing\n> that and limiting this extension to that context may work; if you want this\n> to be useful more generally (and I encourage that), I think this would need\n> significant new text.\n\n",
       "createdAt": "2025-10-16T19:41:05Z",
       "updatedAt": "2025-10-16T19:41:05Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 13,
+      "id": "I_kwDOPYOJds7X9um8",
+      "title": "Separate IPv4 and IPv6 into two separate frames",
+      "url": "https://github.com/MarcoPolo/new-preferred-address/issues/13",
+      "state": "OPEN",
+      "author": "MarcoPolo",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "instead of having a single frame for both",
+      "createdAt": "2025-11-13T23:47:31Z",
+      "updatedAt": "2025-11-13T23:47:31Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 14,
+      "id": "I_kwDOPYOJds7X9yGr",
+      "title": "A way to signal some metadata about the address",
+      "url": "https://github.com/MarcoPolo/new-preferred-address/issues/14",
+      "state": "OPEN",
+      "author": "MarcoPolo",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "As discussed at IETF 124 it may be useful to tell the client information about why you're providing an address.\n\nFor example:\n- Here's another address you can find me at.\nvs\n- I would like to migrate to this address.\nvs\n- please migrate asap to this address.\n\nMaybe something else? ",
+      "createdAt": "2025-11-13T23:56:33Z",
+      "updatedAt": "2025-11-13T23:56:33Z",
       "closedAt": null,
       "comments": []
     }
