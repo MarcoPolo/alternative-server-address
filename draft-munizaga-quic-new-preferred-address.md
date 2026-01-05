@@ -1,7 +1,7 @@
 ---
-title: "QUIC New Server Preferred Address"
+title: "QUIC Alternative Server Address Frames"
 category: std
-docname: draft-munizaga-quic-new-preferred-address-latest
+docname: draft-munizaga-quic-alternative-server-address-latest
 
 ipr: trust200902
 area: "Transport"
@@ -13,7 +13,7 @@ venue:
   mail: "quic@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/quic/"
   github: "MarcoPolo/new-preferred-address"
-  latest: "https://marcopolo.github.io/new-preferred-address/draft-munizaga-quic-new-preferred-address.html"
+  latest: "https://marcopolo.github.io/new-preferred-address/draft-munizaga-quic-alternative-server-address.html"
 
 stand_alone: yes
 smart_quotes: no
@@ -54,8 +54,8 @@ informative:
 
 --- abstract
 
-This document specifies an extension to QUIC to allow a server to request a
-migration to a new preferred address.
+This document specifies an extension to QUIC to allow a server to advertise
+alternative addresses.
 
 --- middle
 
@@ -63,17 +63,14 @@ migration to a new preferred address.
 
 The QUIC transport protocol allows a client to migrate connections at any time
 to any new address ({{Section 9 of QUIC-TRANSPORT}}). This allows the connection
-to survive changes to the client's address. QUIC also allows a server to migrate
-to a different address, but only a single time, and only to an address specified
-at the start of a connection via the Server's Preferred Address ({{Section 9.6
-of QUIC-TRANSPORT}}). For some applications, including those where the server
-and client are peers, limiting the server to only a single migration at the
-beginning is too limiting. This document specifies an extension to QUIC to allow
-a server to request a migration to a new preferred address.
+to survive changes to the client's address. A client can use this mechanism to
+keep redundant paths available or transparently move to a different local
+address. A server, in contrast, can not use alternative addresses as redundant
+paths and has no way to dynamically signal a preferred address. In some
+deployments, specifically peer to peer settings, adding this symmetry is useful.
 
-This document defines a new transport parameter that indicates support of this
-extension and specifies a new frame type to inform the client of the server's
-new preferred address.
+This document specifies an extension to QUIC that allows a server to inform a
+client of alternative, possibly preferred, addresses.
 
 # Conventions and Definitions
 
@@ -83,9 +80,10 @@ new preferred address.
 
 In peer to peer networks, the role of server and client is arbitrary. An
 endpoint may serve as a client in one connection and a server in another.
-Limiting connection migration to clients limits the flexibility of endpoints in
-this network. A peer in this network would like to migrate all of its
-connections, not just the ones it happens to be a client in.
+A peer acting as a server would like to communicate to its peer its alternative
+addresses. The server peer does this for both redundancy (a peer may advertise a
+globally reachable relayed unicast address as a backup) and to signal preference
+(a peer may be using a proxy, and wish to migrate to a new proxy).
 
 While it is not the primary goal, this extension may also assist in NAT
 traversal by migrating to a dynamically chosen server address. A server could
@@ -93,14 +91,18 @@ have a client connect over a relay, and later migrate to a direct connection
 after applying NAT traversal techniques. The specific NAT traversal techniques
 are out of scope of this document.
 
+TODO: Is the above NAT paragraph useful? Would it be better to leave this
+implied?
+
 # Negotiating Extension Use
 
-new_preferred_address (0xff0969d85c):
+alternative_address (0xff0969d85c):
 
 Clients advertise their support of this extension by sending the
-new_preferred_address (0xff0969d85c) transport parameter ({{Section 7.4 of
+alternative_address (0xff0969d85c) transport parameter ({{Section 7.4 of
 QUIC-TRANSPORT}}) with an empty value. Sending this transport parameter signals
-to the server that the client understands the NEW_PREFERRED_ADDRESS frame.
+to the server that the client understands the ALTERNATIVE_V4_ADDRESS and
+ALTERNATIVE_V6_ADDRESS frames.
 
 Servers MUST NOT send this transport parameter. A client that supports this
 extension and receives this transport parameter MUST abort the connection with a
@@ -108,48 +110,69 @@ TRANSPORT_PARAMETER_ERROR.
 
 Endpoints MUST NOT remember the value of this extension for 0-RTT.
 
-# New Preferred Address Frame
+# Server initiated Paths
 
-A server can use an NEW_PREFERRED_ADDRESS frame to request the client to
-migrate the connection to the provided server address. Upon receiving an
-NEW_PREFERRED_ADDRESS, the client MAY initiate migration. If the
-client does migrate it MUST adhere to the client behavior defined in {{Section
-9.6 of QUIC-TRANSPORT}}.
+In connections that use this extension, clients MUST NOT discard probing packets
+received from an unknown server address. Clients MUST validate the path per
+{{Section 9.1 of QUIC-TRANSPORT}}.
 
-The NEW_PREFERRED_ADDRESS is defined as follows:
+TODO alternatively, should clients treat a server address identified by an
+alternative address frame as known, and accept probing packets from this
+address? This would require the server to know its address before hand, which
+could be annoying if the server is behind a NAT and initially reached over a relay.
+
+# Alternative Address Frames
+
+A server uses the following frames to inform the client of an alternative
+address. The Preferred bit signals this address is preferred over the currently
+in-use server address. The Retire bit signals that this address is no longer an
+alternative address for this server (TODO what happens if the server sends a
+Retire bit on the current address?). Clients SHOULD close paths associated
+with addresses for which the Retire bit is set.
+
+When the Retire bit is not set, clients SHOULD open a path to the provided
+address. If the Preferred bit is set, clients should migrate to or otherwise
+prioritze the path with the provided address.
+
+The alternative address frames are defined as follows:
 
 ~~~
-NEW_PREFERRED_ADDRESS Frame {
+ALTERNATIVE_V4_ADDRESS Frame {
   Type (i) = 0x1d5845e2,
-  Sequence Number (i),
+  Preferred (1),
+  Retire (1),
+  unused (6)
+  Status Sequence Number (i),
   IPv4 Address (32),
   IPv4 Port (16),
+}
+~~~
+
+~~~
+ALTERNATIVE_V6_ADDRESS Frame {
+  Type (i) = 0x1d5845e3,
+  Preferred (1),
+  Retire (1),
+  unused (6)
+  Status Sequence Number (i),
   IPv6 Address (128),
   IPv6 Port (16),
 }
 ~~~
 
+The sequence number space is common to the two frame types, and monotonically
+increasing values MUST be used when sending updates for a given IP and Port
+tuple.
+
+TODO: Do we want a probing frame that identifies this path as preferred so it can be used to signal a request to migrate to this path? Do we want to reuse PATH_STATUS_BACKUP or PATH_STATUS_AVAILABLE to harmonize with the Multipath QUIC extension?
+
 Following the common frame format described in {{Section 12.4 of
-QUIC-TRANSPORT}}, NEW_PREFERRED_ADDRESS frames have a type of 0x1d5845e2, and
-contain the following fields:
+QUIC-TRANSPORT}}.
 
-Sequence Number:
+# Frame properties
 
-: A variable-length integer representing the sequence number assigned to the
-  NEW_PREFERRED_ADDRESS frame by the sender so receivers can ignore obsolete
-  frames. A sending endpoint MUST send monotonically increasing values in the
-  Sequence Number field to allow obsolete NEW_PREFERRED_ADDRESS frames to be
-  ignored when packets are processed out of order.
-
-IPv4 and IPv6 Address and Port:
-
-: Analogous to the preferred_address transport parameter, this frame contains an
-  address and port for both IPv4 and IPv6. The four-byte IPv4 Address field is
-  followed by the associated two-byte IPv4 Port field. This is followed by a
-  16-byte IPv6 Address field and two-byte IPv6 Port field.
-
-NEW_PREFERRED_ADDRESS frames are ack-eliciting, and MUST only be sent in the
-application data packet number space.
+all frames are ack-eliciting, and MUST only be sent in the application data
+packet number space.
 
 The server SHOULD ensure that its peer has a sufficient number of available and
 unused connection IDs, as the client will be unable to migrate without an unused
@@ -157,6 +180,10 @@ connection ID. The server MAY bundle a NEW_CONNECTION_ID frame with the
 NEW_PREFERRED_ADDRESS. Likewise, the client should ensure the same to allow the
 server to probe new paths.
 
+# Interaction with the Multipath Extension for QUIC
+
+This extension compliments the Multipath extension for QUIC by allowing the
+server to contribute more information to the client for alternative paths.
 
 # Security Considerations
 
@@ -178,7 +205,7 @@ Clients may mitigate this by randomly delaying the migration.
 
 ## QUIC Transport Parameter
 
-This document registers the new_preferred_address transport parameter in the "QUIC
+This document registers the alternative_address transport parameter in the "QUIC
 Transport Parameters" registry established in {{Section 22.3 of
 QUIC-TRANSPORT}}. The following fields are registered:
 
@@ -186,7 +213,7 @@ Value:
 : 0xff0969d85c
 
 Parameter Name:
-: new_preferred_address
+: alternative_address
 
 Status:
 : Provisional
@@ -202,27 +229,7 @@ Contact:
 
 ## QUIC Frame Types
 
-This document registers one new value in the "QUIC Frame Types" registry
-established in {{Section 22.4 of QUIC-TRANSPORT}}. The following fields are
-registered:
-
-Value:
-: 0x1d5845e2
-
-Frame Type Name:
-: NEW_PREFERRED_ADDRESS
-
-Status:
-: Provisional
-
-Specification:
-: This document
-
-Change Controller:
-: IETF (iesg@ietf.org)
-
-Contact:
-: Marco Munizaga (marco@marcopolo.io)
+TODO 
 
 --- back
 
@@ -231,14 +238,8 @@ Contact:
 
 TODO acknowledge.
 
-# TODOs
-{:numbered="false"}
-
 # Questions
 {:numbered="false"}
 
-- Any new security conserations from allowing a dynamically chosen preferred
-  address?
-
-- Any new security conserations from allowing a deferred chosen preferred
+- Any new security considerations from allowing a dynamically chosen preferred
   address?
