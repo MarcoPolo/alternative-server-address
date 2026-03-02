@@ -12,8 +12,8 @@ venue:
   type: "Working Group"
   mail: "quic@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/quic/"
-  github: "MarcoPolo/new-preferred-address"
-  latest: "https://marcopolo.github.io/new-preferred-address/draft-munizaga-quic-alternative-server-address.html"
+  github: "MarcoPolo/alternative-server-address"
+  latest: "https://marcopolo.github.io/alternative-server-address/draft-munizaga-quic-alternative-server-address.html"
 
 stand_alone: yes
 smart_quotes: no
