@@ -1333,11 +1333,11 @@ ALTERNATIVE_V6_ADDRESS Frame {
 }
 </pre><a href="#section-6-5" class="pilcrow">¶</a>
 </div>
-<p id="section-6-6">The sequence number space is common to the two frame types, and monotonically
+<p id="section-6-6">Following the common frame format described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-12.4" class="relref">Section 12.4</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<p id="section-6-7">The sequence number space is common to the two frame types, and monotonically
 increasing values <span class="bcp14">MUST</span> be used when sending updates for a given IP and Port
-tuple.<a href="#section-6-6" class="pilcrow">¶</a></p>
-<p id="section-6-7">TODO: Do we want a probing frame that identifies this path as preferred so it can be used to signal a request to migrate to this path? Do we want to reuse PATH_STATUS_BACKUP or PATH_STATUS_AVAILABLE to harmonize with the Multipath QUIC extension?<a href="#section-6-7" class="pilcrow">¶</a></p>
-<p id="section-6-8">Following the common frame format described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-12.4" class="relref">Section 12.4</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-6-8" class="pilcrow">¶</a></p>
+tuple.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<p id="section-6-8">TODO: Do we want a probing frame that identifies this path as preferred so it can be used to signal a request to migrate to this path? Do we want to reuse PATH_STATUS_BACKUP or PATH_STATUS_AVAILABLE to harmonize with the Multipath QUIC extension?<a href="#section-6-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="frame-properties">
@@ -1348,10 +1348,10 @@ tuple.<a href="#section-6-6" class="pilcrow">¶</a></p>
 <p id="section-7-1">all frames are ack-eliciting, and <span class="bcp14">MUST</span> only be sent in the application data
 packet number space.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">The server <span class="bcp14">SHOULD</span> ensure that its peer has a sufficient number of available and
-unused connection IDs, as the client will be unable to migrate without an unused
-connection ID. The server <span class="bcp14">MAY</span> bundle a NEW_CONNECTION_ID frame with the
-NEW_PREFERRED_ADDRESS. Likewise, the client should ensure the same to allow the
-server to probe new paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
+unused connection IDs, as the client will be unable to probe paths without an
+unused connection ID. The server <span class="bcp14">MAY</span> bundle a NEW_CONNECTION_ID frame with a
+alternative address frame. Likewise, the client should ensure the same to allow
+the server to probe new paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="interaction-with-the-multipath-extension-for-quic">

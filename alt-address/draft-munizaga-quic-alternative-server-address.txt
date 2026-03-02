@@ -193,6 +193,9 @@ Table of Contents
      IPv6 Port (16),
    }
 
+   Following the common frame format described in Section 12.4 of
+   [QUIC-TRANSPORT].
+
    The sequence number space is common to the two frame types, and
    monotonically increasing values MUST be used when sending updates for
    a given IP and Port tuple.
@@ -202,9 +205,6 @@ Table of Contents
    path?  Do we want to reuse PATH_STATUS_BACKUP or
    PATH_STATUS_AVAILABLE to harmonize with the Multipath QUIC extension?
 
-   Following the common frame format described in Section 12.4 of
-   [QUIC-TRANSPORT].
-
 7.  Frame properties
 
    all frames are ack-eliciting, and MUST only be sent in the
@@ -212,8 +212,8 @@ Table of Contents
 
    The server SHOULD ensure that its peer has a sufficient number of
    available and unused connection IDs, as the client will be unable to
-   migrate without an unused connection ID.  The server MAY bundle a
-   NEW_CONNECTION_ID frame with the NEW_PREFERRED_ADDRESS.  Likewise,
+   probe paths without an unused connection ID.  The server MAY bundle a
+   NEW_CONNECTION_ID frame with a alternative address frame.  Likewise,
    the client should ensure the same to allow the server to probe new
    paths.
 
