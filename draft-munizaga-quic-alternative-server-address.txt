@@ -14,7 +14,9 @@ Expires: 22 January 2027                                    21 July 2026
 Abstract
 
    This document specifies an extension to QUIC that allows a server to
-   advertise an ordered set of alternative addresses.
+   advertise an ordered set of alternative addresses.  This allows a
+   client to migrate the connection as the availability or preference of
+   server addresses changes.
 
 About This Document
 
@@ -69,37 +71,43 @@ Table of Contents
 
    1.  Introduction
    2.  Conventions and Definitions
-   3.  Motivation
-   4.  Negotiating Extension Use
-   5.  Server initiated Paths
-   6.  Alternative Address Frame
-   7.  Connection ID Management
-   8.  Interaction with the Multipath Extension for QUIC
-   9.  Security Considerations
-     9.1.  Request Forgery Attacks
-     9.2.  DDoS - Thundering herd
-   10. IANA Considerations
-     10.1.  QUIC Transport Parameter
-     10.2.  QUIC Frame Types
-   11. Normative References
+   3.  Negotiating Extension Use
+   4.  Server initiated Paths
+   5.  Alternative Address Frame
+   6.  Connection ID Management
+   7.  Interaction with the Multipath Extension for QUIC
+   8.  Security Considerations
+     8.1.  Request Forgery Attacks
+     8.2.  DDoS - Thundering herd
+   9.  IANA Considerations
+     9.1.  QUIC Transport Parameter
+     9.2.  QUIC Frame Types
+   10. Normative References
    Acknowledgments
    Questions
    Authors' Addresses
 
 1.  Introduction
 
-   The QUIC transport protocol allows a client to migrate connections at
-   any time to any new address (Section 9 of [RFC9000]).  This allows
-   the connection to survive changes to the client's address.  A client
-   can use this mechanism to keep redundant paths available or
-   transparently move to a different local address.  A server, in
-   contrast, can not use alternative addresses as redundant paths and
-   has no way to dynamically signal a preferred address.  In some
-   deployments, specifically peer to peer settings, adding this symmetry
-   is useful.
+   QUIC supports client-initiated connection migration, allowing a
+   connection to survive changes to the client's address and enabling
+   the client to select among available paths (Section 9 of [RFC9000]).
+   A server can advertise a preferred address during the handshake
+   (Section 9.6 of [RFC9000]), but cannot update that address or
+   advertise additional addresses during the connection.
 
-   This document specifies an extension to QUIC that allows a server to
-   inform a client of alternative, possibly preferred, addresses.
+   Some deployments have multiple server addresses whose availability or
+   preference can change over the lifetime of a connection.  These
+   include multihomed endpoints, relays, proxies, and peer-to-peer
+   systems.
+
+   This document defines an extension that allows a server to advertise
+   an ordered and replaceable set of alternative addresses.  The client
+   remains responsible for validating these addresses and initiating any
+   connection migration.
+
+   Address discovery and NAT traversal mechanisms, including hole
+   punching, are out of scope of this document.
 
 2.  Conventions and Definitions
 
@@ -109,26 +117,7 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  Motivation
-
-   In peer to peer networks, the role of server and client is arbitrary.
-   An endpoint may serve as a client in one connection and a server in
-   another.  A peer acting as a server would like to communicate to its
-   peer its alternative addresses.  The server peer does this for both
-   redundancy (a peer may advertise a globally reachable relayed unicast
-   address as a backup) and to signal preference (a peer may be using a
-   proxy, and wish to migrate to a new proxy).
-
-   While it is not the primary goal, this extension may also assist in
-   NAT traversal by migrating to a dynamically chosen server address.  A
-   server could have a client connect over a relay, and later migrate to
-   a direct connection after applying NAT traversal techniques.  The
-   specific NAT traversal techniques are out of scope of this document.
-
-   TODO: Is the above NAT paragraph useful?  Would it be better to leave
-   this implied?
-
-4.  Negotiating Extension Use
+3.  Negotiating Extension Use
 
    alternative_address (0xff0969d85c):
 
@@ -144,7 +133,7 @@ Table of Contents
 
    Endpoints MUST NOT remember the value of this extension for 0-RTT.
 
-5.  Server initiated Paths
+4.  Server initiated Paths
 
    In connections that use this extension, clients MUST NOT discard
    probing packets received from an unknown server address.  Clients
@@ -156,7 +145,7 @@ Table of Contents
    before hand, which could be annoying if the server is behind a NAT
    and initially reached over a relay.
 
-6.  Alternative Address Frame
+5.  Alternative Address Frame
 
    A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete
    set of alternative addresses and their priority relative to the
@@ -221,7 +210,7 @@ Table of Contents
    ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST only be sent in
    the application data packet number space.
 
-7.  Connection ID Management
+6.  Connection ID Management
 
    Each endpoint SHOULD advertise an active_connection_id_limit that
    allows its peer to supply enough connection IDs for all paths that
@@ -235,20 +224,20 @@ Table of Contents
    frame.  Likewise, the client SHOULD ensure that the server has enough
    connection IDs to probe new paths.
 
-8.  Interaction with the Multipath Extension for QUIC
+7.  Interaction with the Multipath Extension for QUIC
 
    This extension complements the Multipath extension for QUIC by
    allowing the server to contribute more information to the client for
    alternative paths.
 
-9.  Security Considerations
+8.  Security Considerations
 
-9.1.  Request Forgery Attacks
+8.1.  Request Forgery Attacks
 
    The same considerations from Section 21.5 of [RFC9000] apply here as
    well.
 
-9.2.  DDoS - Thundering herd
+8.2.  DDoS - Thundering herd
 
    A malicious server could wait until it has received a large number of
    clients, and request a migration from all of them at the same time to
@@ -257,9 +246,9 @@ Table of Contents
 
    Clients may mitigate this by randomly delaying the migration.
 
-10.  IANA Considerations
+9.  IANA Considerations
 
-10.1.  QUIC Transport Parameter
+9.1.  QUIC Transport Parameter
 
    This document registers the alternative_address transport parameter
    in the "QUIC Transport Parameters" registry established in
@@ -277,7 +266,7 @@ Table of Contents
 
    Contact:  Marco Munizaga (marco@marcopolo.io)
 
-10.2.  QUIC Frame Types
+9.2.  QUIC Frame Types
 
    This document registers the ALTERNATIVE_ADDRESS frame in the "QUIC
    Frame Types" registry established in Section 22.4 of [RFC9000].  The
@@ -295,7 +284,7 @@ Table of Contents
 
    Contact:  Marco Munizaga (marco@marcopolo.io)
 
-11.  Normative References
+10.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
