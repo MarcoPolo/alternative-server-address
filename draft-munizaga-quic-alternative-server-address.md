@@ -37,44 +37,33 @@ informative:
 --- abstract
 
 This document specifies an extension to QUIC that allows a server to advertise
-an ordered set of alternative addresses.
+an ordered set of alternative addresses. This allows a client to migrate the
+connection as the availability or preference of server addresses changes.
 
 --- middle
 
 # Introduction
 
-The QUIC transport protocol allows a client to migrate connections at any time
-to any new address ({{Section 9 of RFC9000}}). This allows the connection
-to survive changes to the client's address. A client can use this mechanism to
-keep redundant paths available or transparently move to a different local
-address. A server, in contrast, can not use alternative addresses as redundant
-paths and has no way to dynamically signal a preferred address. In some
-deployments, specifically peer to peer settings, adding this symmetry is useful.
+QUIC supports client-initiated connection migration, allowing a connection to
+survive changes to the client's address and enabling the client to select among
+available paths ({{Section 9 of RFC9000}}). A server can advertise a preferred
+address during the handshake ({{Section 9.6 of RFC9000}}), but cannot update
+that address or advertise additional addresses during the connection.
 
-This document specifies an extension to QUIC that allows a server to inform a
-client of alternative, possibly preferred, addresses.
+Some deployments have multiple server addresses whose availability or preference
+can change over the lifetime of a connection. These include multihomed
+endpoints, relays, proxies, and peer-to-peer systems.
+
+This document defines an extension that allows a server to advertise an ordered
+and replaceable set of alternative addresses. The client remains responsible for
+validating these addresses and initiating any connection migration.
+
+Address discovery and NAT traversal mechanisms, including hole punching, are
+out of scope of this document.
 
 # Conventions and Definitions
 
 {::boilerplate bcp14-tagged}
-
-# Motivation
-
-In peer to peer networks, the role of server and client is arbitrary. An
-endpoint may serve as a client in one connection and a server in another.
-A peer acting as a server would like to communicate to its peer its alternative
-addresses. The server peer does this for both redundancy (a peer may advertise a
-globally reachable relayed unicast address as a backup) and to signal preference
-(a peer may be using a proxy, and wish to migrate to a new proxy).
-
-While it is not the primary goal, this extension may also assist in NAT
-traversal by migrating to a dynamically chosen server address. A server could
-have a client connect over a relay, and later migrate to a direct connection
-after applying NAT traversal techniques. The specific NAT traversal techniques
-are out of scope of this document.
-
-TODO: Is the above NAT paragraph useful? Would it be better to leave this
-implied?
 
 # Negotiating Extension Use
 
