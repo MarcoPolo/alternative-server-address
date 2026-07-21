@@ -74,6 +74,7 @@ Table of Contents
    3.  Negotiating Extension Use
    4.  Server initiated Paths
    5.  Alternative Address Frame
+     5.1.  Address Selection and Reachability
    6.  Connection ID Management
    7.  Interaction with the Multipath Extension for QUIC
    8.  Security Considerations
@@ -209,6 +210,21 @@ Table of Contents
 
    ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST only be sent in
    the application data packet number space.
+
+5.1.  Address Selection and Reachability
+
+   The mechanism by which a server discovers and selects addresses to
+   advertise is outside the scope of this document.  An advertised
+   address is a candidate and does not imply reachability from the
+   client.  A server SHOULD limit the advertised set to addresses that
+   it has reason to believe might be reachable, and SHOULD update the
+   set when it learns that an address is no longer usable.
+
+   Advertised addresses can include private-use, unique-local, or other
+   limited-scope addresses.  A client MAY decline to probe an address
+   according to local policy.  A client MUST successfully validate a
+   path before sending non-probing frames on it.  The request forgery
+   considerations in Sections 21.5.3 and 21.5.6 of [RFC9000] apply.
 
 6.  Connection ID Management
 

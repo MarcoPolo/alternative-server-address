@@ -1167,6 +1167,11 @@ connection as the availability or preference of server addresses changes.<a href
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-alternative-address-frame" class="internal xref">Alternative Address Frame</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-address-selection-and-reach" class="internal xref">Address Selection and Reachability</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-connection-id-management" class="internal xref">Connection ID Management</a></p>
@@ -1335,6 +1340,23 @@ longer advertised by this extension. The client <span class="bcp14">SHOULD</span
 non-current path associated with an address that is no longer advertised.<a href="#section-5-8" class="pilcrow">¶</a></p>
 <p id="section-5-9">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> only be sent in the
 application data packet number space.<a href="#section-5-9" class="pilcrow">¶</a></p>
+<div id="address-selection-and-reachability">
+<section id="section-5.1">
+        <h3 id="name-address-selection-and-reach">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-address-selection-and-reach" class="section-name selfRef">Address Selection and Reachability</a>
+        </h3>
+<p id="section-5.1-1">The mechanism by which a server discovers and selects addresses to advertise is
+outside the scope of this document. An advertised address is a candidate and
+does not imply reachability from the client. A server <span class="bcp14">SHOULD</span> limit the
+advertised set to addresses that it has reason to believe might be reachable,
+and <span class="bcp14">SHOULD</span> update the set when it learns that an address is no longer usable.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Advertised addresses can include private-use, unique-local, or other
+limited-scope addresses. A client <span class="bcp14">MAY</span> decline to probe an address according to
+local policy. A client <span class="bcp14">MUST</span> successfully validate a path before sending
+non-probing frames on it. The request forgery considerations in Sections 21.5.3
+and 21.5.6 of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> apply.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="connection-id-management">
