@@ -29,24 +29,7 @@ author:
     email: martenseemann@gmail.com
 
 normative:
-
-  QUIC-TRANSPORT:
-    title: "QUIC: A UDP-Based Multiplexed and Secure Transport"
-    date: 2021-05
-    seriesinfo:
-      RFC: 9000
-      DOI: 10.17487/RFC9000
-    author:
-      -
-        ins: J. Iyengar
-        name: Jana Iyengar
-        org: Fastly
-        role: editor
-      -
-        ins: M. Thomson
-        name: Martin Thomson
-        org: Mozilla
-        role: editor
+  RFC9000:
 
 
 informative:
@@ -61,7 +44,7 @@ an ordered set of alternative addresses.
 # Introduction
 
 The QUIC transport protocol allows a client to migrate connections at any time
-to any new address ({{Section 9 of QUIC-TRANSPORT}}). This allows the connection
+to any new address ({{Section 9 of RFC9000}}). This allows the connection
 to survive changes to the client's address. A client can use this mechanism to
 keep redundant paths available or transparently move to a different local
 address. A server, in contrast, can not use alternative addresses as redundant
@@ -99,7 +82,7 @@ alternative_address (0xff0969d85c):
 
 Clients advertise their support of this extension by sending the
 alternative_address (0xff0969d85c) transport parameter ({{Section 7.4 of
-QUIC-TRANSPORT}}) with an empty value. Sending this transport parameter signals
+RFC9000}}) with an empty value. Sending this transport parameter signals
 to the server that the client understands the ALTERNATIVE_ADDRESS frame.
 
 Servers MUST NOT send this transport parameter. A client that supports this
@@ -112,7 +95,7 @@ Endpoints MUST NOT remember the value of this extension for 0-RTT.
 
 In connections that use this extension, clients MUST NOT discard probing packets
 received from an unknown server address. Clients MUST validate the path per
-{{Section 9.1 of QUIC-TRANSPORT}}.
+{{Section 9.1 of RFC9000}}.
 
 TODO alternatively, should clients treat a server address identified by an
 alternative address frame as known, and accept probing packets from this
@@ -127,7 +110,7 @@ frame replaces the state established by any previously processed
 ALTERNATIVE_ADDRESS frame.
 
 The frame uses the following format, following the conventions described in
-{{Section 12.4 of QUIC-TRANSPORT}}:
+{{Section 12.4 of RFC9000}}:
 
 ~~~
 ALTERNATIVE_ADDRESS Frame {
@@ -201,7 +184,7 @@ server to contribute more information to the client for alternative paths.
 
 ## Request Forgery Attacks
 
-The same considerations from {{Section 21.5 of QUIC-TRANSPORT}} apply here as
+The same considerations from {{Section 21.5 of RFC9000}} apply here as
 well.
 
 ## DDoS - Thundering herd
@@ -219,7 +202,7 @@ Clients may mitigate this by randomly delaying the migration.
 
 This document registers the alternative_address transport parameter in the "QUIC
 Transport Parameters" registry established in {{Section 22.3 of
-QUIC-TRANSPORT}}. The following fields are registered:
+RFC9000}}. The following fields are registered:
 
 Value:
 : 0xff0969d85c
@@ -242,8 +225,8 @@ Contact:
 ## QUIC Frame Types
 
 This document registers the ALTERNATIVE_ADDRESS frame in the "QUIC Frame Types"
-registry established in {{Section 22.4 of QUIC-TRANSPORT}}. The following fields
-are registered:
+registry established in {{Section 22.4 of RFC9000}}. The following fields are
+registered:
 
 Value:
 : 0x1d5845e2
