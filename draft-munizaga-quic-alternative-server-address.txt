@@ -5,8 +5,7 @@
 QUIC                                                         M. Munizaga
 Internet-Draft                                       Ethereum Foundation
 Intended status: Standards Track                              M. Seemann
-Expires: 3 September 2026                                      Smallstep
-                                                            2 March 2026
+Expires: 22 January 2027                                    21 July 2026
 
 
                  QUIC Alternative Server Address Frames
@@ -50,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 September 2026.
+   This Internet-Draft will expire on 22 January 2027.
 
 Copyright Notice
 
@@ -298,5 +297,4 @@ Authors' Addresses
 
 
    Marten Seemann
-   Smallstep
    Email: martenseemann@gmail.com
