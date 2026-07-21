@@ -91,16 +91,26 @@ TRANSPORT_PARAMETER_ERROR.
 
 Endpoints MUST NOT remember the value of this extension for 0-RTT.
 
-# Server initiated Paths
+# Path Validation
 
-In connections that use this extension, clients MUST NOT discard probing packets
-received from an unknown server address. Clients MUST validate the path per
-{{Section 9.1 of RFC9000}}.
+Advertising an alternative address does not create a new path or initiate
+connection migration. As in {{Section 9 of RFC9000}}, clients remain responsible
+for initiating all connection migrations. A client initiates path validation by
+sending probing packets to an advertised address and only migrates after
+validation succeeds. Packets from unadvertised server addresses are handled as
+specified by RFC 9000, except for the validation response described below. Such
+packets do not create new paths.
 
-TODO alternatively, should clients treat a server address identified by an
-alternative address frame as known, and accept probing packets from this
-address? This would require the server to know its address before hand, which
-could be annoying if the server is behind a NAT and initially reached over a relay.
+The response to a client-initiated PATH_CHALLENGE can arrive from a server
+address other than the address being validated. {{Section 8.2.2 of RFC9000}}
+requires the server to send the PATH_RESPONSE on the path where it received the
+PATH_CHALLENGE, but prohibits the client from enforcing this requirement. A
+matching PATH_RESPONSE received on any path validates the path on which the
+PATH_CHALLENGE was sent ({{Section 8.2.3 of RFC9000}}). Consequently, when
+validating an advertised address, a client MUST NOT discard a successfully
+authenticated probing packet containing a matching PATH_RESPONSE solely because
+it was received from an unadvertised server address. The response does not
+validate its source address or make that address eligible for migration.
 
 # Alternative Address Frame
 
