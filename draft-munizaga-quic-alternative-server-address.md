@@ -164,16 +164,20 @@ frames are received out of order. An address omitted from the newer frame is no
 longer advertised by this extension. The client SHOULD stop probing or using a
 non-current path associated with an address that is no longer advertised.
 
-# Frame properties
-
 ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST only be sent in the
 application data packet number space.
 
-The server SHOULD ensure that its peer has a sufficient number of available and
-unused connection IDs, as the client will be unable to probe paths without an
-unused connection ID. The server MAY bundle one or more NEW_CONNECTION_ID frames
-with an ALTERNATIVE_ADDRESS frame. Likewise, the client should ensure the same
-to allow the server to probe new paths.
+# Connection ID Management
+
+Each endpoint SHOULD advertise an active_connection_id_limit that allows its
+peer to supply enough connection IDs for all paths that the endpoint might probe
+concurrently. This applies in both directions.
+
+The server SHOULD ensure that the client has a sufficient number of available
+and unused connection IDs, as the client will be unable to probe paths without
+an unused connection ID. The server MAY bundle one or more NEW_CONNECTION_ID
+frames with an ALTERNATIVE_ADDRESS frame. Likewise, the client SHOULD ensure
+that the server has enough connection IDs to probe new paths.
 
 # Interaction with the Multipath Extension for QUIC
 
