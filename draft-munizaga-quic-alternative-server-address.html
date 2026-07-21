@@ -1170,7 +1170,7 @@ an ordered set of alternative addresses.<a href="#section-abstract-1" class="pil
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-alternative-address-frame" class="internal xref">Alternative Address Frame</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-frame-properties" class="internal xref">Frame properties</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-connection-id-management" class="internal xref">Connection ID Management</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-interaction-with-the-multip" class="internal xref">Interaction with the Multipath Extension for QUIC</a></p>
@@ -1350,20 +1350,23 @@ Therefore, a newer frame atomically replaces an older address set even if the
 frames are received out of order. An address omitted from the newer frame is no
 longer advertised by this extension. The client <span class="bcp14">SHOULD</span> stop probing or using a
 non-current path associated with an address that is no longer advertised.<a href="#section-6-8" class="pilcrow">¶</a></p>
+<p id="section-6-9">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> only be sent in the
+application data packet number space.<a href="#section-6-9" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="frame-properties">
+<div id="connection-id-management">
 <section id="section-7">
-      <h2 id="name-frame-properties">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-frame-properties" class="section-name selfRef">Frame properties</a>
+      <h2 id="name-connection-id-management">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-connection-id-management" class="section-name selfRef">Connection ID Management</a>
       </h2>
-<p id="section-7-1">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> only be sent in the
-application data packet number space.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">The server <span class="bcp14">SHOULD</span> ensure that its peer has a sufficient number of available and
-unused connection IDs, as the client will be unable to probe paths without an
-unused connection ID. The server <span class="bcp14">MAY</span> bundle one or more NEW_CONNECTION_ID frames
-with an ALTERNATIVE_ADDRESS frame. Likewise, the client should ensure the same
-to allow the server to probe new paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-1">Each endpoint <span class="bcp14">SHOULD</span> advertise an active_connection_id_limit that allows its
+peer to supply enough connection IDs for all paths that the endpoint might probe
+concurrently. This applies in both directions.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">The server <span class="bcp14">SHOULD</span> ensure that the client has a sufficient number of available
+and unused connection IDs, as the client will be unable to probe paths without
+an unused connection ID. The server <span class="bcp14">MAY</span> bundle one or more NEW_CONNECTION_ID
+frames with an ALTERNATIVE_ADDRESS frame. Likewise, the client <span class="bcp14">SHOULD</span> ensure
+that the server has enough connection IDs to probe new paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="interaction-with-the-multipath-extension-for-quic">

@@ -73,7 +73,7 @@ Table of Contents
    4.  Negotiating Extension Use
    5.  Server initiated Paths
    6.  Alternative Address Frame
-   7.  Frame properties
+   7.  Connection ID Management
    8.  Interaction with the Multipath Extension for QUIC
    9.  Security Considerations
      9.1.  Request Forgery Attacks
@@ -218,17 +218,22 @@ Table of Contents
    or using a non-current path associated with an address that is no
    longer advertised.
 
-7.  Frame properties
-
    ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST only be sent in
    the application data packet number space.
 
-   The server SHOULD ensure that its peer has a sufficient number of
+7.  Connection ID Management
+
+   Each endpoint SHOULD advertise an active_connection_id_limit that
+   allows its peer to supply enough connection IDs for all paths that
+   the endpoint might probe concurrently.  This applies in both
+   directions.
+
+   The server SHOULD ensure that the client has a sufficient number of
    available and unused connection IDs, as the client will be unable to
    probe paths without an unused connection ID.  The server MAY bundle
    one or more NEW_CONNECTION_ID frames with an ALTERNATIVE_ADDRESS
-   frame.  Likewise, the client should ensure the same to allow the
-   server to probe new paths.
+   frame.  Likewise, the client SHOULD ensure that the server has enough
+   connection IDs to probe new paths.
 
 8.  Interaction with the Multipath Extension for QUIC
 
