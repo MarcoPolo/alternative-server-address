@@ -4,33 +4,32 @@
 <meta charset="utf-8">
 <meta content="Common,Latin" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
-<title>QUIC New Server Preferred Address</title>
+<title>QUIC Alternative Server Address Frames</title>
 <meta content="Marco Munizaga" name="author">
 <meta content="Marten Seemann" name="author">
 <meta content="
-       This document specifies an extension to QUIC to allow a server to request a
-migration to a new preferred address. 
+       This document specifies an extension to QUIC to allow a server to advertise
+alternative addresses. 
     " name="description">
-<meta content="xml2rfc 3.30.2" name="generator">
-<meta content="Connection Migration" name="keyword">
-<meta content="Server's Preferred Address" name="keyword">
-<meta content="draft-munizaga-quic-new-preferred-address-latest" name="ietf.draft">
+<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="Internet-Draft" name="keyword">
+<meta content="draft-munizaga-quic-alternative-server-address-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.2
-    Python 3.12.11
-    ConfigArgParse 1.7
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
-    intervaltree 3.1.0
+    intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 5.3.1
-    platformdirs 4.4.0
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.1
     pycountry 24.6.1
-    PyYAML 6.0.2
-    requests 2.32.5
-    setuptools 80.9.0
-    wcwidth 0.2.14
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.8.2
 -->
-<link href="draft-munizaga-quic-new-preferred-address.xml" rel="alternate" type="application/rfc+xml">
+<link href="draft-munizaga-quic-alternative-server-address.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">@font-face {
   font-family: 'Lora';
@@ -169,7 +168,7 @@ migration to a new preferred address.
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
   font-family: 'Oxygen Mono';
@@ -177,7 +176,8 @@ migration to a new preferred address.
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 }
 
 @font-face {
@@ -294,16 +294,19 @@ h1, h2, h3, h4, h5, h6 {
   font-size-adjust: 0.5;
   color: var(--title-color);
 }
-h1#title {
-  font-size: 32px;
-  line-height: 40px;
-  clear: both;
-}
-h1#title, h1#rfcnum {
-  margin: 1.5em 0 0.2em;
-}
-h1#rfcnum + h1#title {
-  margin: 0.2em 0;
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
 }
 
 h1, h2, h3 {
@@ -323,10 +326,10 @@ h4, h5, h6 {
 #abstract+p {
   font-size: 18px;
   line-height: 24px;
-}
-#abstract+p code, #abstract+p samp, #abstract+p tt {
-  font-size: 16px;
-  line-height: 0;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
 }
 
 p {
@@ -337,59 +340,59 @@ p {
 div {
   margin: 0;
 }
-.alignRight.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignRight.art-text pre {
-  padding: 0;
-  width: auto;
-}
 .alignRight {
   margin: 1em 0;
-}
-.alignRight > *:first-child {
-  border: none;
-  margin: 0;
-  float: right;
-  clear: both;
-}
-.alignRight > *:nth-child(2) {
-  clear: both;
-  display: block;
-  border: none;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
 }
 svg {
   display: block;
-}
-/* font-family isn't space-separated, but =~ will have to do */
-svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
-  font-family: var(--font-mono);
-}
-.alignCenter.art-text {
-  background-color: var(--highlight-color);
-  border: 1px solid var(--line-color);
-  border-radius: 3px;
-  padding: 0.5em 1em 0;
-  margin-bottom: 0.5em;
-}
-.alignCenter.art-text pre {
-  padding: 0;
-  width: auto;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
 }
 .alignCenter {
   margin: 1em 0;
-}
-.alignCenter > *:first-child {
-  border: none;
-  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
-     support flexbox yet.
-  */
-  display: table;
-  margin: 0 auto;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
 }
 
 /* lists */
@@ -427,26 +430,25 @@ dl {
     --indent: 5ch;
     & > dt {
       min-width: calc(var(--indent) - 2ch);
+      float: none;
     }
-  }
-  &.olPercent > dt {
-    float: none;
   }
 
   dl > dd > & {
     margin-top: 0.5em;
     margin-bottom: 0;
   }
-}
-dl:not(.dlNewline) > dt {
-  float: left;
-  margin-right: 2ch;
-  min-width: 8ch;
-}
-dl > dd {
-  margin-bottom: .8em;
-  margin-left: var(--indent) !important; /* stupid element overrides */
-  min-height: 2ex;
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
 }
 :is(dl.compact, .dlCompact) > dd {
   margin-bottom: 0;
@@ -462,20 +464,22 @@ dl > dd {
 }
 
 /* links */
-a, a[href].selfRef:hover {
+a {
   text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
 }
-a[href] {
-  color: var(--link-color);
-}
-a[href].selfRef, .iref + a[href].internal {
+.iref + a[href].internal {
   color: var(--text-color);
-}
-a[href]:hover {
-  text-decoration: underline;
-}
-a[href].selfRef:hover {
-  background-color: var(--highlight-color);
 }
 a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
   white-space: nowrap;
@@ -511,9 +515,9 @@ img {
 figure {
   margin: 0.5em 0;
   padding: 0;
-}
-figure blockquote {
-  margin: 0.8em 0.4em 0.4em;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
 }
 figcaption, caption {
   font-style: italic;
@@ -523,17 +527,19 @@ figcaption, caption {
 }
 @media screen {
   /* Auto-collapse boilerplate. */
-  :is(#status-of-memo, #copyright) p {
-    margin: -2px 0;
-    max-height: 0;
-    transition: max-height 2s ease, margin 0.5s ease 0.5s;
-    overflow: hidden;
-  }
-  :is(#status-of-memo, #copyright):hover p,
-  :is(#status-of-memo, #copyright) h2:target ~ p {
-    margin: 0.5em 0;
-    max-height: 500px;
-    overflow: auto;
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
   }
   pre, svg {
     display: inline-block;
@@ -569,6 +575,7 @@ aside, blockquote {
 }
 blockquote {
   margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
 }
 cite {
   display: block;
@@ -582,25 +589,17 @@ table {
   max-width: 100%;
   margin: 0 0 1em;
   border-collapse: collapse;
-}
-table.right {
-  margin-left: auto;
-}
-table.center {
-  margin-left: auto;
-  margin-right: auto;
-}
-table.left {
-  margin-right: auto;
-}
-table .text-left {
-  text-align: left;
-}
-table .text-center {
-  text-align: center;
-}
-table .text-right {
-  text-align: right;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
 }
 
 thead, tbody {
@@ -620,13 +619,6 @@ th {
 :is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
   background-color: var(--highlight-color);
 }
-table caption {
-  margin: 0;
-  padding: 3px 0 3px 1em;
-}
-table p {
-  margin: 0;
-}
 
 /* pilcrow */
 a.pilcrow {
@@ -637,18 +629,16 @@ a.pilcrow {
     color: var(--pilcrow-weak);
     &:hover { text-decoration: none; }
   }
-}
-@media not print {
-  :hover > a.pilcrow {
-    opacity: 1;
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
   }
-  a.pilcrow[href]:hover {
-    color: var(--pilcrow-strong);
-    background-color: transparent;
-  }
-}
-@media print {
-  a.pilcrow {
+  @media print {
     display: none;
   }
 }
@@ -707,9 +697,9 @@ sub, sup {
   font-size: 0.9em;
   font-style: italic;
   margin-top: 2em;
-}
-.docInfo .prepared {
-  float: right;
+  & .prepared {
+    float: right;
+  }
 }
 
 /* table of contents */
@@ -799,23 +789,27 @@ hr.addr {
   max-width: calc(100% - 16px);
 }
 @media (min-width: 500px) {
-  #authors-addresses > section {
-    column-count: 2;
-    column-gap: 20px;
-  }
-  #authors-addresses > section > h2 {
-    column-span: all;
-  }
-  /* hack for break-inside: avoid-column */
-  #authors-addresses address {
-    display: inline-block;
-    break-inside: avoid-column;
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
   }
 }
 
 /* Comments */
-.rfcEditorRemove p:first-of-type {
-  font-style: italic;
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
 }
 .cref {
   background-color: rgba(249, 232, 105, 0.3);
@@ -826,19 +820,21 @@ hr.addr {
 }
 
 @media screen {
-  #toc nav {
-    font-family: var(--font-title);
-    font-weight: 360;
-    & > ul { margin-bottom: 2em; }
-    & ul {
-      margin: 0 0 0 4px;
-      & :is(p, li) {
-        margin: 2px 0;
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
       }
     }
-  }
-  #toc a.toplink {
-    float: right;
+    & a.toplink {
+      float: right;
+    }
   }
 }
 @media not screen {
@@ -859,54 +855,54 @@ hr.addr {
     margin: 0;
     border-bottom: 1px solid #ccc;
     opacity: 0.6;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 2px 0 2px 6px;
-    padding-right: 1em;
-    font-size: 18px;
-    line-height: 24px;
-    min-width: 190px;
-    text-align: right;
-    background-color: #444;
-    color: white;
-    cursor: pointer;
-    &::before { /* css hamburger */
-      float: right;
-      position: relative;
-      width: 1em;
-      height: 1px;
-      left: -164px;
-      margin: 8px 0 0 0;
-      background: white none repeat scroll 0 0;
-      box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
-      content: "";
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
     }
-  }
-  #toc nav {
-    display: none;
-    background-color: var(--background-color);
-    padding: 0.5em 1em 1em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    height: calc(100vh - 48px);
-    border-left: 1px solid #ddd;
-  }
-  #toc.active {
-    opacity: 1;
-    & nav { display: block; }
-  }
-  /* Make the collapsed ToC header render white on gray also when it's a link */
-  #toc h2 a,
-  #toc h2 a:is(:link, :focus, :hover),
-  #toc a.toplink,
-  #toc a.toplink:hover {
-    color: white;
-    background-color: #444;
-    text-decoration: none;
-  }
-  #toc a.toplink {
-    margin: 2px 0.5em 0;
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
   }
 }
 
@@ -925,26 +921,26 @@ hr.addr {
     margin: 0;
     padding: 0;
     z-index: 1;
-  }
-  #toc h2 {
-    margin: 0;
-    padding: 0.25em 1em 1em 0;
-  }
-  #toc nav {
-    display: block;
-    height: calc(90vh - 84px);
-    bottom: 0;
-    padding: 0.5em 0 2em;
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
   }
   img { /* future proofing */
     max-width: 100%;
     height: auto;
-  }
-  #toc a.toplink {
-    margin: 8px 0.5em 0;
   }
 }
 
@@ -960,12 +956,13 @@ hr.addr {
   #n-copyright-notice {
     border-bottom: none;
   }
-  #toc, #n-introduction {
-    page-break-before: always;
-  }
   #toc {
+    page-break-before: always;
     border-top: none;
     padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
   }
   figure, pre, .vcard {
     page-break-inside: avoid;
@@ -1027,17 +1024,19 @@ hr.addr {
 }
 
 /* SVG Trick: a prefix match works because only black and white are allowed */
-svg :is([stroke="black"], [stroke^="#000"]) {
-  stroke: var(--text-color);
-}
-svg :is([stroke="white"], [stroke^="#fff"]) {
-  stroke: var(--background-color);
-}
-svg :is([fill="black"], [fill^="#000"], :not([fill])) {
-  fill: var(--text-color);
-}
-svg :is([fill="white"], [fill^="#fff"]) {
-  fill: var(--background-color);
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
 }
 </style>
 
@@ -1046,12 +1045,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">QUIC New Server Preferred Address</td>
-<td class="right">October 2025</td>
+<td class="center">QUIC Alternative Server Address Frames</td>
+<td class="right">July 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Munizaga &amp; Seemann</td>
-<td class="center">Expires 9 April 2026</td>
+<td class="center">Expires 22 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,15 +1060,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">QUIC</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-munizaga-quic-new-preferred-address-latest</dd>
+<dd class="internet-draft">draft-munizaga-quic-alternative-server-address-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-10-06" class="published">6 October 2025</time>
+<time datetime="2026-07-21" class="published">21 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-04-09">9 April 2026</time></dd>
+<dd class="expires"><time datetime="2027-01-22">22 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1078,16 +1077,31 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </div>
 <div class="author">
       <div class="author-name">M. Seemann</div>
-<div class="org">Smallstep</div>
 </div>
 </dd>
 </dl>
 </div>
-<h1 id="title">QUIC New Server Preferred Address</h1>
+<h1 id="title">QUIC Alternative Server Address Frames</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document specifies an extension to QUIC to allow a server to request a
-migration to a new preferred address.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document specifies an extension to QUIC to allow a server to advertise
+alternative addresses.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://marcopolo.github.io/alternative-server-address/draft-munizaga-quic-alternative-server-address.html">https://marcopolo.github.io/alternative-server-address/draft-munizaga-quic-alternative-server-address.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-munizaga-quic-alternative-server-address/">https://datatracker.ietf.org/doc/draft-munizaga-quic-alternative-server-address/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        QUIC Working Group mailing list (<span><a href="mailto:quic@ietf.org">mailto:quic@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/quic/">https://mailarchive.ietf.org/arch/browse/quic/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/quic/">https://www.ietf.org/mailman/listinfo/quic/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/MarcoPolo/alternative-server-address">https://github.com/MarcoPolo/alternative-server-address</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1108,7 +1122,7 @@ migration to a new preferred address.<a href="#section-abstract-1" class="pilcro
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 April 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1117,7 +1131,7 @@ migration to a new preferred address.<a href="#section-abstract-1" class="pilcro
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2025 IETF Trust and the persons identified as the
+            Copyright (c) 2026 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1150,47 +1164,50 @@ migration to a new preferred address.<a href="#section-abstract-1" class="pilcro
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-negotiating-extension-use" class="internal xref">Negotiating Extension Use</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-new-preferred-address-frame" class="internal xref">New Preferred Address Frame</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-server-initiated-paths" class="internal xref">Server initiated Paths</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-changes-to-servers-preferre" class="internal xref">Changes to Server's Preferred Address from RFC 9000</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-alternative-address-frames" class="internal xref">Alternative Address Frames</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-request-forgery-attacks" class="internal xref">Request Forgery Attacks</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-ddos-thundering-herd" class="internal xref">DDoS - Thundering herd</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-frame-properties" class="internal xref">Frame properties</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-quic-transport-parameter" class="internal xref">QUIC Transport Parameter</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-interaction-with-the-multip" class="internal xref">Interaction with the Multipath Extension for QUIC</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-quic-frame-types" class="internal xref">QUIC Frame Types</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-request-forgery-attacks" class="internal xref">Request Forgery Attacks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-ddos-thundering-herd" class="internal xref">DDoS - Thundering herd</a></p>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
-</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-quic-transport-parameter" class="internal xref">QUIC Transport Parameter</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-quic-frame-types" class="internal xref">QUIC Frame Types</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-todos" class="internal xref">TODOs</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-questions" class="internal xref">Questions</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-questions" class="internal xref">Questions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1203,15 +1220,13 @@ migration to a new preferred address.<a href="#section-abstract-1" class="pilcro
       </h2>
 <p id="section-1-1">The QUIC transport protocol allows a client to migrate connections at any time
 to any new address (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-9" class="relref">Section 9</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>). This allows the connection
-to survive changes to the client's address. QUIC also allows a server to migrate
-to a different address, but only a single time, and only to an address specified
-at the start of a connection via the Server's Preferred Address (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-9.6" class="relref">Section 9.6</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>). For some applications, including those where the server
-and client are peers, limiting the server to only a single migration at the
-beginning is too limiting. This document specifies an extension to QUIC to allow
-a server to request a migration to a new preferred address.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">This document defines a new transport parameter that indicates support of this
-extension and specifies a new frame type to inform the client of the server's
-new preferred address.<a href="#section-1-2" class="pilcrow">¶</a></p>
+to survive changes to the client's address. A client can use this mechanism to
+keep redundant paths available or transparently move to a different local
+address. A server, in contrast, can not use alternative addresses as redundant
+paths and has no way to dynamically signal a preferred address. In some
+deployments, specifically peer to peer settings, adding this symmetry is useful.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This document specifies an extension to QUIC that allows a server to inform a
+client of alternative, possibly preferred, addresses.<a href="#section-1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1232,14 +1247,17 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       </h2>
 <p id="section-3-1">In peer to peer networks, the role of server and client is arbitrary. An
 endpoint may serve as a client in one connection and a server in another.
-Limiting connection migration to clients limits the flexibility of endpoints in
-this network. A peer in this network would like to migrate all of its
-connections, not just the ones it happens to be a client in.<a href="#section-3-1" class="pilcrow">¶</a></p>
+A peer acting as a server would like to communicate to its peer its alternative
+addresses. The server peer does this for both redundancy (a peer may advertise a
+globally reachable relayed unicast address as a backup) and to signal preference
+(a peer may be using a proxy, and wish to migrate to a new proxy).<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">While it is not the primary goal, this extension may also assist in NAT
 traversal by migrating to a dynamically chosen server address. A server could
 have a client connect over a relay, and later migrate to a direct connection
 after applying NAT traversal techniques. The specific NAT traversal techniques
 are out of scope of this document.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">TODO: Is the above NAT paragraph useful? Would it be better to leave this
+implied?<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="negotiating-extension-use">
@@ -1247,205 +1265,190 @@ are out of scope of this document.<a href="#section-3-2" class="pilcrow">¶</a><
       <h2 id="name-negotiating-extension-use">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-negotiating-extension-use" class="section-name selfRef">Negotiating Extension Use</a>
       </h2>
-<p id="section-4-1">new_preferred_address (0xff0969d85c):<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-1">alternative_address (0xff0969d85c):<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">Clients advertise their support of this extension by sending the
-new_preferred_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>) with an empty value. Sending this transport parameter signals
-to the server that the client understands the NEW_PREFERRED_ADDRESS frame.<a href="#section-4-2" class="pilcrow">¶</a></p>
+alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>) with an empty value. Sending this transport parameter signals
+to the server that the client understands the ALTERNATIVE_V4_ADDRESS and
+ALTERNATIVE_V6_ADDRESS frames.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <p id="section-4-3">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
 extension and receives this transport parameter <span class="bcp14">MUST</span> abort the connection with a
 TRANSPORT_PARAMETER_ERROR.<a href="#section-4-3" class="pilcrow">¶</a></p>
 <p id="section-4-4">Endpoints <span class="bcp14">MUST NOT</span> remember the value of this extension for 0-RTT.<a href="#section-4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="new-preferred-address-frame">
+<div id="server-initiated-paths">
 <section id="section-5">
-      <h2 id="name-new-preferred-address-frame">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-new-preferred-address-frame" class="section-name selfRef">New Preferred Address Frame</a>
+      <h2 id="name-server-initiated-paths">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-server-initiated-paths" class="section-name selfRef">Server initiated Paths</a>
       </h2>
-<p id="section-5-1">A server can use an NEW_PREFERRED_ADDRESS frame to request the client to
-migrate the connection to the provided server address. Upon receiving an
-NEW_PREFERRED_ADDRESS, the client <span class="bcp14">MAY</span> initiate migration. If the
-client does migrate it <span class="bcp14">MUST</span> adhere to the client behavior defined in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-9.6" class="relref">Section 9.6</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>, with exceptions specified in <a href="#changes" class="auto internal xref">Section 6</a>.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">The NEW_PREFERRED_ADDRESS is defined as follows:<a href="#section-5-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-5-3">
+<p id="section-5-1">In connections that use this extension, clients <span class="bcp14">MUST NOT</span> discard probing packets
+received from an unknown server address. Clients <span class="bcp14">MUST</span> validate the path per
+<span><a href="https://rfc-editor.org/rfc/rfc9000#section-9.1" class="relref">Section 9.1</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">TODO alternatively, should clients treat a server address identified by an
+alternative address frame as known, and accept probing packets from this
+address? This would require the server to know its address before hand, which
+could be annoying if the server is behind a NAT and initially reached over a relay.<a href="#section-5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="alternative-address-frames">
+<section id="section-6">
+      <h2 id="name-alternative-address-frames">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-alternative-address-frames" class="section-name selfRef">Alternative Address Frames</a>
+      </h2>
+<p id="section-6-1">A server uses the following frames to inform the client of an alternative
+address. The Preferred bit signals this address is preferred over the currently
+in-use server address. The Retire bit signals that this address is no longer an
+alternative address for this server (TODO what happens if the server sends a
+Retire bit on the current address?). Clients <span class="bcp14">SHOULD</span> close paths associated
+with addresses for which the Retire bit is set.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">When the Retire bit is not set, clients <span class="bcp14">SHOULD</span> open a path to the provided
+address. If the Preferred bit is set, clients should migrate to or otherwise
+prioritze the path with the provided address.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">The alternative address frames are defined as follows:<a href="#section-6-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6-4">
 <pre>
-NEW_PREFERRED_ADDRESS Frame {
+ALTERNATIVE_V4_ADDRESS Frame {
   Type (i) = 0x1d5845e2,
-  Sequence Number (i),
+  Preferred (1),
+  Retire (1),
+  unused (6)
+  Status Sequence Number (i),
   IPv4 Address (32),
   IPv4 Port (16),
+}
+</pre><a href="#section-6-4" class="pilcrow">¶</a>
+</div>
+<div class="alignLeft art-text artwork" id="section-6-5">
+<pre>
+ALTERNATIVE_V6_ADDRESS Frame {
+  Type (i) = 0x1d5845e3,
+  Preferred (1),
+  Retire (1),
+  unused (6)
+  Status Sequence Number (i),
   IPv6 Address (128),
   IPv6 Port (16),
 }
-</pre><a href="#section-5-3" class="pilcrow">¶</a>
+</pre><a href="#section-6-5" class="pilcrow">¶</a>
 </div>
-<p id="section-5-4">Following the common frame format described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-12.4" class="relref">Section 12.4</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>, NEW_PREFERRED_ADDRESS frames have a type of 0x1d5845e2, and
-contain the following fields:<a href="#section-5-4" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-5-5">
-        <dt id="section-5-5.1">Sequence Number:</dt>
-        <dd style="margin-left: 1.5em" id="section-5-5.2">
-          <p id="section-5-5.2.1">A variable-length integer representing the sequence number assigned to the
-NEW_PREFERRED_ADDRESS frame by the sender so receivers can ignore obsolete
-frames. A sending endpoint <span class="bcp14">MUST</span> send monotonically increasing values in the
-Sequence Number field to allow obsolete NEW_PREFERRED_ADDRESS frames to be
-ignored when packets are processed out of order.<a href="#section-5-5.2.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-<dt id="section-5-5.3">IPv4 and IPv6 Address and Port:</dt>
-        <dd style="margin-left: 1.5em" id="section-5-5.4">
-          <p id="section-5-5.4.1">Analogous to the preferred_address transport parameter, this frame contains an
-address and port for both IPv4 and IPv6. The four-byte IPv4 Address field is
-followed by the associated two-byte IPv4 Port field. This is followed by a
-16-byte IPv6 Address field and two-byte IPv6 Port field.<a href="#section-5-5.4.1" class="pilcrow">¶</a></p>
-</dd>
-      <dd class="break"></dd>
-</dl>
-<p id="section-5-6">NEW_PREFERRED_ADDRESS frames are ack-eliciting, and <span class="bcp14">MUST</span> only be sent in the
-application data packet number space.<a href="#section-5-6" class="pilcrow">¶</a></p>
-<p id="section-5-7">The server <span class="bcp14">SHOULD</span> ensure that its peer has a sufficient number of available and
-unused connection IDs, as the client will be unable to migrate without an unused
-connection ID. The server <span class="bcp14">MAY</span> bundle a NEW_CONNECTION_ID frame with the
-NEW_PREFERRED_ADDRESS. Likewise, the client should ensure the same to allow the
-server to probe new paths.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-6-6">Following the common frame format described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-12.4" class="relref">Section 12.4</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<p id="section-6-7">The sequence number space is common to the two frame types, and monotonically
+increasing values <span class="bcp14">MUST</span> be used when sending updates for a given IP and Port
+tuple.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<p id="section-6-8">TODO: Do we want a probing frame that identifies this path as preferred so it can be used to signal a request to migrate to this path? Do we want to reuse PATH_STATUS_BACKUP or PATH_STATUS_AVAILABLE to harmonize with the Multipath QUIC extension?<a href="#section-6-8" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="changes">
-<section id="section-6">
-      <h2 id="name-changes-to-servers-preferre">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-changes-to-servers-preferre" class="section-name selfRef">Changes to Server's Preferred Address from RFC 9000</a>
+<div id="frame-properties">
+<section id="section-7">
+      <h2 id="name-frame-properties">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-frame-properties" class="section-name selfRef">Frame properties</a>
       </h2>
-<p id="section-6-1">If a client advertises support for this extension it should modify its
-migration behavior to a server's preferred address as follows.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">Clients <span class="bcp14">MUST</span> support migrating to a new server address mid connection.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">Clients <span class="bcp14">SHOULD</span> respond to PATH_CHALLENGE frames from the server from new paths,
-even if the client has not initiated a migration. This allows the server to
-probe viable paths before sending an NEW_PREFERRED_ADDRESS frame.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-7-1">all frames are ack-eliciting, and <span class="bcp14">MUST</span> only be sent in the application data
+packet number space.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">The server <span class="bcp14">SHOULD</span> ensure that its peer has a sufficient number of available and
+unused connection IDs, as the client will be unable to probe paths without an
+unused connection ID. The server <span class="bcp14">MAY</span> bundle a NEW_CONNECTION_ID frame with a
+alternative address frame. Likewise, the client should ensure the same to allow
+the server to probe new paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="interaction-with-the-multipath-extension-for-quic">
+<section id="section-8">
+      <h2 id="name-interaction-with-the-multip">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-interaction-with-the-multip" class="section-name selfRef">Interaction with the Multipath Extension for QUIC</a>
+      </h2>
+<p id="section-8-1">This extension compliments the Multipath extension for QUIC by allowing the
+server to contribute more information to the client for alternative paths.<a href="#section-8-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-7">
+<section id="section-9">
       <h2 id="name-security-considerations">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 <div id="request-forgery-attacks">
-<section id="section-7.1">
+<section id="section-9.1">
         <h3 id="name-request-forgery-attacks">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-request-forgery-attacks" class="section-name selfRef">Request Forgery Attacks</a>
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-request-forgery-attacks" class="section-name selfRef">Request Forgery Attacks</a>
         </h3>
-<p id="section-7.1-1">The same considerations from <span><a href="https://rfc-editor.org/rfc/rfc9000#section-21.5" class="relref">Section 21.5</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span> apply here as
-well.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-9.1-1">The same considerations from <span><a href="https://rfc-editor.org/rfc/rfc9000#section-21.5" class="relref">Section 21.5</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span> apply here as
+well.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ddos-thundering-herd">
-<section id="section-7.2">
+<section id="section-9.2">
         <h3 id="name-ddos-thundering-herd">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-ddos-thundering-herd" class="section-name selfRef">DDoS - Thundering herd</a>
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-ddos-thundering-herd" class="section-name selfRef">DDoS - Thundering herd</a>
         </h3>
-<p id="section-7.2-1">A malicious server could wait until it has received a large number of clients,
+<p id="section-9.2-1">A malicious server could wait until it has received a large number of clients,
 and request a migration from all of them at the same time to a victim endpoint.
 If the clients all migrate at the same time, they may overload or otherwise
-negatively impact the victim endpoint.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2">Clients <span class="bcp14">MAY</span> defer migration until after a PATH_CHALLENGE frame is received from
-the server's new preferred address. Clients may also mitigate this by randomly
-delaying the migration.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+negatively impact the victim endpoint.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">Clients may mitigate this by randomly delaying the migration.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-8">
+<section id="section-10">
       <h2 id="name-iana-considerations">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
 <div id="quic-transport-parameter">
-<section id="section-8.1">
+<section id="section-10.1">
         <h3 id="name-quic-transport-parameter">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-quic-transport-parameter" class="section-name selfRef">QUIC Transport Parameter</a>
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-quic-transport-parameter" class="section-name selfRef">QUIC Transport Parameter</a>
         </h3>
-<p id="section-8.1-1">This document registers the new_preferred_address transport parameter in the "QUIC
-Transport Parameters" registry established in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.3" class="relref">Section 22.3</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>. The following fields are registered:<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-8.1-2">
-          <dt id="section-8.1-2.1">Value:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.2">
-            <p id="section-8.1-2.2.1">0xff0969d85c<a href="#section-8.1-2.2.1" class="pilcrow">¶</a></p>
+<p id="section-10.1-1">This document registers the alternative_address transport parameter in the "QUIC
+Transport Parameters" registry established in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.3" class="relref">Section 22.3</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>. The following fields are registered:<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-10.1-2">
+          <dt id="section-10.1-2.1">Value:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.1-2.2">
+            <p id="section-10.1-2.2.1">0xff0969d85c<a href="#section-10.1-2.2.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-8.1-2.3">Parameter Name:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.4">
-            <p id="section-8.1-2.4.1">new_preferred_address<a href="#section-8.1-2.4.1" class="pilcrow">¶</a></p>
+<dt id="section-10.1-2.3">Parameter Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.1-2.4">
+            <p id="section-10.1-2.4.1">alternative_address<a href="#section-10.1-2.4.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-8.1-2.5">Status:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.6">
-            <p id="section-8.1-2.6.1">Provisional<a href="#section-8.1-2.6.1" class="pilcrow">¶</a></p>
+<dt id="section-10.1-2.5">Status:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.1-2.6">
+            <p id="section-10.1-2.6.1">Provisional<a href="#section-10.1-2.6.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-8.1-2.7">Specification:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.8">
-            <p id="section-8.1-2.8.1">This document<a href="#section-8.1-2.8.1" class="pilcrow">¶</a></p>
+<dt id="section-10.1-2.7">Specification:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.1-2.8">
+            <p id="section-10.1-2.8.1">This document<a href="#section-10.1-2.8.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-8.1-2.9">Change Controller:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.10">
-            <p id="section-8.1-2.10.1">IETF (iesg@ietf.org)<a href="#section-8.1-2.10.1" class="pilcrow">¶</a></p>
+<dt id="section-10.1-2.9">Change Controller:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.1-2.10">
+            <p id="section-10.1-2.10.1">IETF (iesg@ietf.org)<a href="#section-10.1-2.10.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
-<dt id="section-8.1-2.11">Contact:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.1-2.12">
-            <p id="section-8.1-2.12.1">Marco Munizaga (marco@marcopolo.io)<a href="#section-8.1-2.12.1" class="pilcrow">¶</a></p>
+<dt id="section-10.1-2.11">Contact:</dt>
+          <dd style="margin-left: 1.5em" id="section-10.1-2.12">
+            <p id="section-10.1-2.12.1">Marco Munizaga (marco@marcopolo.io)<a href="#section-10.1-2.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="quic-frame-types">
-<section id="section-8.2">
+<section id="section-10.2">
         <h3 id="name-quic-frame-types">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-quic-frame-types" class="section-name selfRef">QUIC Frame Types</a>
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-quic-frame-types" class="section-name selfRef">QUIC Frame Types</a>
         </h3>
-<p id="section-8.2-1">This document registers one new value in the "QUIC Frame Types" registry
-established in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.4" class="relref">Section 22.4</a> of [<a href="#QUIC-TRANSPORT" class="cite xref">QUIC-TRANSPORT</a>]</span>. The following fields are
-registered:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-8.2-2">
-          <dt id="section-8.2-2.1">Value:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.2-2.2">
-            <p id="section-8.2-2.2.1">0x1d5845e2<a href="#section-8.2-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.2-2.3">Frame Type Name:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.2-2.4">
-            <p id="section-8.2-2.4.1">NEW_PREFERRED_ADDRESS<a href="#section-8.2-2.4.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.2-2.5">Status:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.2-2.6">
-            <p id="section-8.2-2.6.1">Provisional<a href="#section-8.2-2.6.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.2-2.7">Specification:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.2-2.8">
-            <p id="section-8.2-2.8.1">This document<a href="#section-8.2-2.8.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.2-2.9">Change Controller:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.2-2.10">
-            <p id="section-8.2-2.10.1">IETF (iesg@ietf.org)<a href="#section-8.2-2.10.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-8.2-2.11">Contact:</dt>
-          <dd style="margin-left: 1.5em" id="section-8.2-2.12">
-            <p id="section-8.2-2.12.1">Marco Munizaga (marco@marcopolo.io)<a href="#section-8.2-2.12.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-</dl>
+<p id="section-10.2-1">TODO<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-normative-references">
-<section id="section-9">
+<section id="section-11">
       <h2 id="name-normative-references">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
 <dt id="QUIC-TRANSPORT">[QUIC-TRANSPORT]</dt>
@@ -1471,36 +1474,21 @@ registered:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="todos">
-<section id="appendix-B">
-      <h2 id="name-todos">
-<a href="#name-todos" class="section-name selfRef">TODOs</a>
-    </h2>
-</section>
-</div>
 <div id="questions">
-<section id="appendix-C">
+<section id="appendix-B">
       <h2 id="name-questions">
 <a href="#name-questions" class="section-name selfRef">Questions</a>
       </h2>
 <ul class="normal">
-<li class="normal" id="appendix-C-1.1">
-          <p id="appendix-C-1.1.1">Any new security considerations from allowing a server to send path challenge
-frames?<a href="#appendix-C-1.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-C-1.2">
-          <p id="appendix-C-1.2.1">Any new security conserations from allowing a dynamically chosen preferred
-address?<a href="#appendix-C-1.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-C-1.3">
-          <p id="appendix-C-1.3.1">Any new security conserations from allowing a deferred chosen preferred
-address?<a href="#appendix-C-1.3.1" class="pilcrow">¶</a></p>
+<li class="normal" id="appendix-B-1.1">
+          <p id="appendix-B-1.1.1">Any new security considerations from allowing a dynamically chosen preferred
+address?<a href="#appendix-B-1.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-D">
+<section id="appendix-C">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
@@ -1514,7 +1502,6 @@ address?<a href="#appendix-C-1.3.1" class="pilcrow">¶</a></p>
 </address>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Marten Seemann</span></div>
-<div dir="auto" class="left"><span class="org">Smallstep</span></div>
 <div class="email">
 <span>Email:</span>
 <a href="mailto:martenseemann@gmail.com" class="email">martenseemann@gmail.com</a>
