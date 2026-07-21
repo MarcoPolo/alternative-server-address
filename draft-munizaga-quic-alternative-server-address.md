@@ -54,8 +54,8 @@ informative:
 
 --- abstract
 
-This document specifies an extension to QUIC to allow a server to advertise
-alternative addresses.
+This document specifies an extension to QUIC that allows a server to advertise
+an ordered set of alternative addresses.
 
 --- middle
 
@@ -101,8 +101,7 @@ alternative_address (0xff0969d85c):
 Clients advertise their support of this extension by sending the
 alternative_address (0xff0969d85c) transport parameter ({{Section 7.4 of
 QUIC-TRANSPORT}}) with an empty value. Sending this transport parameter signals
-to the server that the client understands the ALTERNATIVE_V4_ADDRESS and
-ALTERNATIVE_V6_ADDRESS frames.
+to the server that the client understands the ALTERNATIVE_ADDRESS frame.
 
 Servers MUST NOT send this transport parameter. A client that supports this
 extension and receives this transport parameter MUST abort the connection with a
@@ -121,68 +120,82 @@ alternative address frame as known, and accept probing packets from this
 address? This would require the server to know its address before hand, which
 could be annoying if the server is behind a NAT and initially reached over a relay.
 
-# Alternative Address Frames
+# Alternative Address Frame
 
-A server uses the following frames to inform the client of an alternative
-address. The Preferred bit signals this address is preferred over the currently
-in-use server address. The Retire bit signals that this address is no longer an
-alternative address for this server (TODO what happens if the server sends a
-Retire bit on the current address?). Clients SHOULD close paths associated
-with addresses for which the Retire bit is set.
+A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete set of
+alternative addresses and their priority relative to the current path. Each
+frame replaces the state established by any previously processed
+ALTERNATIVE_ADDRESS frame.
 
-When the Retire bit is not set, clients SHOULD open a path to the provided
-address. If the Preferred bit is set, clients should migrate to or otherwise
-prioritze the path with the provided address.
-
-The alternative address frames are defined as follows:
+The frame uses the following format, following the conventions described in
+{{Section 12.4 of QUIC-TRANSPORT}}:
 
 ~~~
-ALTERNATIVE_V4_ADDRESS Frame {
+ALTERNATIVE_ADDRESS Frame {
   Type (i) = 0x1d5845e2,
-  Preferred (1),
-  Retire (1),
-  unused (6)
-  Status Sequence Number (i),
-  IPv4 Address (32),
-  IPv4 Port (16),
+  Sequence Number (i),
+  Entry Count (i),
+  Address Entry (..) ...,
 }
 ~~~
 
+The Entry Count field contains the number of Address Entry fields in the frame.
+An Address Entry starts with an 8-bit Address Type and has one of the following
+formats:
+
 ~~~
-ALTERNATIVE_V6_ADDRESS Frame {
-  Type (i) = 0x1d5845e3,
-  Preferred (1),
-  Retire (1),
-  unused (6)
-  Status Sequence Number (i),
+CURRENT_PATH Entry {
+  Address Type (8) = 0x00,
+}
+
+IPV4 Entry {
+  Address Type (8) = 0x01,
+  IPv4 Address (32),
+  IPv4 Port (16),
+}
+
+IPV6 Entry {
+  Address Type (8) = 0x02,
   IPv6 Address (128),
   IPv6 Port (16),
 }
 ~~~
 
-Following the common frame format described in {{Section 12.4 of
-QUIC-TRANSPORT}}.
+Entries are ordered from highest to lowest priority. The CURRENT_PATH entry is
+a sentinel representing the server address of the current path and carries no
+address or port. A frame MUST contain exactly one CURRENT_PATH entry and MUST
+contain each IP address and port tuple at most once. Receipt of a frame that
+violates these requirements or contains an unknown Address Type MUST be treated
+as a connection error of type FRAME_ENCODING_ERROR.
 
-The sequence number space is common to the two frame types, and monotonically
-increasing values MUST be used when sending updates for a given IP and Port
-tuple.
+IPV4 and IPV6 entries before CURRENT_PATH have higher priority than the current
+path. The client SHOULD promptly validate these addresses and migrate to the
+highest-priority address for which path validation succeeds. Entries after
+CURRENT_PATH are backup addresses. The client MAY validate paths to these
+addresses, but SHOULD NOT migrate to one solely because it was advertised.
 
-TODO: Do we want a probing frame that identifies this path as preferred so it can be used to signal a request to migrate to this path? Do we want to reuse PATH_STATUS_BACKUP or PATH_STATUS_AVAILABLE to harmonize with the Multipath QUIC extension?
+A server MUST use a larger Sequence Number for each address-set update. A client
+MUST ignore an ALTERNATIVE_ADDRESS frame whose Sequence Number is not greater
+than that of the most recently processed ALTERNATIVE_ADDRESS frame.
+Therefore, a newer frame atomically replaces an older address set even if the
+frames are received out of order. An address omitted from the newer frame is no
+longer advertised by this extension. The client SHOULD stop probing or using a
+non-current path associated with an address that is no longer advertised.
 
 # Frame properties
 
-all frames are ack-eliciting, and MUST only be sent in the application data
-packet number space.
+ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST only be sent in the
+application data packet number space.
 
 The server SHOULD ensure that its peer has a sufficient number of available and
 unused connection IDs, as the client will be unable to probe paths without an
-unused connection ID. The server MAY bundle a NEW_CONNECTION_ID frame with a
-alternative address frame. Likewise, the client should ensure the same to allow
-the server to probe new paths.
+unused connection ID. The server MAY bundle one or more NEW_CONNECTION_ID frames
+with an ALTERNATIVE_ADDRESS frame. Likewise, the client should ensure the same
+to allow the server to probe new paths.
 
 # Interaction with the Multipath Extension for QUIC
 
-This extension compliments the Multipath extension for QUIC by allowing the
+This extension complements the Multipath extension for QUIC by allowing the
 server to contribute more information to the client for alternative paths.
 
 # Security Considerations
@@ -229,7 +242,27 @@ Contact:
 
 ## QUIC Frame Types
 
-TODO
+This document registers the ALTERNATIVE_ADDRESS frame in the "QUIC Frame Types"
+registry established in {{Section 22.4 of QUIC-TRANSPORT}}. The following fields
+are registered:
+
+Value:
+: 0x1d5845e2
+
+Frame Type Name:
+: ALTERNATIVE_ADDRESS
+
+Status:
+: Provisional
+
+Specification:
+: This document
+
+Change Controller:
+: IETF (iesg@ietf.org)
+
+Contact:
+: Marco Munizaga (marco@marcopolo.io)
 
 --- back
 
