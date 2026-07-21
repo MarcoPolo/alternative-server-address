@@ -14,7 +14,7 @@ Expires: 22 January 2027                                    21 July 2026
 Abstract
 
    This document specifies an extension to QUIC that allows a server to
-   advertise an ordered set of alternative addresses.  This allows a
+   advertise a prioritized set of alternative addresses.  This allows a
    client to migrate the connection as the availability or preference of
    server addresses changes.
 
@@ -103,9 +103,9 @@ Table of Contents
    systems.
 
    This document defines an extension that allows a server to advertise
-   an ordered and replaceable set of alternative addresses.  The client
-   remains responsible for validating these addresses and initiating any
-   connection migration.
+   a prioritized and replaceable set of alternative addresses.  The
+   client remains responsible for validating these addresses and
+   initiating any connection migration.
 
    Address discovery and NAT traversal mechanisms, including hole
    punching, are out of scope of this document.
@@ -186,30 +186,46 @@ Table of Contents
 
    IPV4 Entry {
      Address Type (8) = 0x01,
+     Priority Hint (i),
      IPv4 Address (32),
      IPv4 Port (16),
    }
 
    IPV6 Entry {
      Address Type (8) = 0x02,
+     Priority Hint (i),
      IPv6 Address (128),
      IPv6 Port (16),
    }
 
-   Entries are ordered from highest to lowest priority.  The
-   CURRENT_PATH entry is a sentinel representing the server address of
-   the current path and carries no address or port.  A frame MUST
-   contain exactly one CURRENT_PATH entry and MUST contain each IP
-   address and port tuple at most once.  Receipt of a frame that
-   violates these requirements or contains an unknown Address Type MUST
-   be treated as a connection error of type FRAME_ENCODING_ERROR.
+   The Priority Hint field is a QUIC variable-length integer.  On each
+   side of the CURRENT_PATH entry, lower values indicate higher priority
+   and entries with the same value form a priority group in which the
+   server expresses no preference.  Entries on each side MUST appear in
+   ascending Priority Hint order.  Priority Hint values have meaning
+   only relative to other values on the same side of the CURRENT_PATH
+   entry; values on opposite sides are unrelated.  A server can assign
+   the same value to every entry.
+
+   The CURRENT_PATH entry is a sentinel representing the server address
+   of the current path and carries no priority hint, address, or port.
+   A frame MUST contain exactly one CURRENT_PATH entry and MUST contain
+   each IP address and port tuple at most once.  Receipt of a frame that
+   violates these requirements, does not order entries as required, or
+   contains an unknown Address Type MUST be treated as a connection
+   error of type FRAME_ENCODING_ERROR.
 
    IPV4 and IPV6 entries before CURRENT_PATH have higher priority than
    the current path.  The client SHOULD promptly validate these
-   addresses and migrate to the highest-priority address for which path
-   validation succeeds.  Entries after CURRENT_PATH are backup
-   addresses.  The client MAY validate paths to these addresses, but
-   SHOULD NOT migrate to one solely because it was advertised.
+   addresses and migrate to a validated address.  Entries after
+   CURRENT_PATH are backup addresses.  The client MAY validate paths to
+   these addresses, but SHOULD NOT migrate to one solely because it was
+   advertised.
+
+   Priority hints are advisory.  A client MAY use them to decide which
+   addresses to validate, which validations to perform in parallel, and
+   which validated address to use.  A client MAY disregard priority
+   hints based on local policy.
 
    A server MUST use a larger Sequence Number for each address-set
    update.  A client MUST ignore an ALTERNATIVE_ADDRESS frame whose

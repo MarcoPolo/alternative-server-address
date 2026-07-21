@@ -9,7 +9,7 @@
 <meta content="Marten Seemann" name="author">
 <meta content="
        This document specifies an extension to QUIC that allows a server to advertise
-an ordered set of alternative addresses. This allows a client to migrate the
+a prioritized set of alternative addresses. This allows a client to migrate the
 connection as the availability or preference of server addresses changes. 
     " name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
@@ -1086,7 +1086,7 @@ svg {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document specifies an extension to QUIC that allows a server to advertise
-an ordered set of alternative addresses. This allows a client to migrate the
+a prioritized set of alternative addresses. This allows a client to migrate the
 connection as the availability or preference of server addresses changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
@@ -1230,9 +1230,10 @@ that address or advertise additional addresses during the connection.<a href="#s
 <p id="section-1-2">Some deployments have multiple server addresses whose availability or preference
 can change over the lifetime of a connection. These include multihomed
 endpoints, relays, proxies, and peer-to-peer systems.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">This document defines an extension that allows a server to advertise an ordered
-and replaceable set of alternative addresses. The client remains responsible for
-validating these addresses and initiating any connection migration.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document defines an extension that allows a server to advertise a
+prioritized and replaceable set of alternative addresses. The client remains
+responsible for validating these addresses and initiating any connection
+migration.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">Address discovery and NAT traversal mechanisms, including hole punching, are
 out of scope of this document.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
@@ -1320,37 +1321,49 @@ CURRENT_PATH Entry {
 
 IPV4 Entry {
   Address Type (8) = 0x01,
+  Priority Hint (i),
   IPv4 Address (32),
   IPv4 Port (16),
 }
 
 IPV6 Entry {
   Address Type (8) = 0x02,
+  Priority Hint (i),
   IPv6 Address (128),
   IPv6 Port (16),
 }
 </pre><a href="#section-5-5" class="pilcrow">¶</a>
 </div>
-<p id="section-5-6">Entries are ordered from highest to lowest priority. The CURRENT_PATH entry is
-a sentinel representing the server address of the current path and carries no
-address or port. A frame <span class="bcp14">MUST</span> contain exactly one CURRENT_PATH entry and <span class="bcp14">MUST</span>
-contain each IP address and port tuple at most once. Receipt of a frame that
-violates these requirements or contains an unknown Address Type <span class="bcp14">MUST</span> be treated
-as a connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-6" class="pilcrow">¶</a></p>
-<p id="section-5-7">IPV4 and IPV6 entries before CURRENT_PATH have higher priority than the current
-path. The client <span class="bcp14">SHOULD</span> promptly validate these addresses and migrate to the
-highest-priority address for which path validation succeeds. Entries after
-CURRENT_PATH are backup addresses. The client <span class="bcp14">MAY</span> validate paths to these
-addresses, but <span class="bcp14">SHOULD NOT</span> migrate to one solely because it was advertised.<a href="#section-5-7" class="pilcrow">¶</a></p>
-<p id="section-5-8">A server <span class="bcp14">MUST</span> use a larger Sequence Number for each address-set update. A client
+<p id="section-5-6">The Priority Hint field is a QUIC variable-length integer. On each side of the
+CURRENT_PATH entry, lower values indicate higher priority and entries with the
+same value form a priority group in which the server expresses no preference.
+Entries on each side <span class="bcp14">MUST</span> appear in ascending Priority Hint order. Priority Hint
+values have meaning only relative to other values on the same side of the
+CURRENT_PATH entry; values on opposite sides are unrelated. A server can assign
+the same value to every entry.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<p id="section-5-7">The CURRENT_PATH entry is a sentinel representing the server address of the
+current path and carries no priority hint, address, or port. A frame <span class="bcp14">MUST</span> contain
+exactly one CURRENT_PATH entry and <span class="bcp14">MUST</span> contain each IP address and port tuple at
+most once. Receipt of a frame that violates these requirements, does not order
+entries as required, or contains an unknown Address Type <span class="bcp14">MUST</span> be treated as a
+connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-5-8">IPV4 and IPV6 entries before CURRENT_PATH have higher priority than the current
+path. The client <span class="bcp14">SHOULD</span> promptly validate these addresses and migrate to a
+validated address. Entries after CURRENT_PATH are backup addresses. The client
+<span class="bcp14">MAY</span> validate paths to these addresses, but <span class="bcp14">SHOULD NOT</span> migrate to one solely
+because it was advertised.<a href="#section-5-8" class="pilcrow">¶</a></p>
+<p id="section-5-9">Priority hints are advisory. A client <span class="bcp14">MAY</span> use them to decide which addresses to
+validate, which validations to perform in parallel, and which validated address
+to use. A client <span class="bcp14">MAY</span> disregard priority hints based on local policy.<a href="#section-5-9" class="pilcrow">¶</a></p>
+<p id="section-5-10">A server <span class="bcp14">MUST</span> use a larger Sequence Number for each address-set update. A client
 <span class="bcp14">MUST</span> ignore an ALTERNATIVE_ADDRESS frame whose Sequence Number is not greater
 than that of the most recently processed ALTERNATIVE_ADDRESS frame.
 Therefore, a newer frame atomically replaces an older address set even if the
 frames are received out of order. An address omitted from the newer frame is no
 longer advertised by this extension. The client <span class="bcp14">SHOULD</span> stop probing or using a
-non-current path associated with an address that is no longer advertised.<a href="#section-5-8" class="pilcrow">¶</a></p>
-<p id="section-5-9">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> only be sent in the
-application data packet number space.<a href="#section-5-9" class="pilcrow">¶</a></p>
+non-current path associated with an address that is no longer advertised.<a href="#section-5-10" class="pilcrow">¶</a></p>
+<p id="section-5-11">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> only be sent in the
+application data packet number space.<a href="#section-5-11" class="pilcrow">¶</a></p>
 <div id="address-selection-and-reachability">
 <section id="section-5.1">
         <h3 id="name-address-selection-and-reach">
