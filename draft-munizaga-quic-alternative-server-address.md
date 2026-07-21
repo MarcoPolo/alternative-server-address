@@ -156,6 +156,20 @@ non-current path associated with an address that is no longer advertised.
 ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST only be sent in the
 application data packet number space.
 
+## Address Selection and Reachability
+
+The mechanism by which a server discovers and selects addresses to advertise is
+outside the scope of this document. An advertised address is a candidate and
+does not imply reachability from the client. A server SHOULD limit the
+advertised set to addresses that it has reason to believe might be reachable,
+and SHOULD update the set when it learns that an address is no longer usable.
+
+Advertised addresses can include private-use, unique-local, or other
+limited-scope addresses. A client MAY decline to probe an address according to
+local policy. A client MUST successfully validate a path before sending
+non-probing frames on it. The request forgery considerations in Sections 21.5.3
+and 21.5.6 of {{RFC9000}} apply.
+
 # Connection ID Management
 
 Each endpoint SHOULD advertise an active_connection_id_limit that allows its
