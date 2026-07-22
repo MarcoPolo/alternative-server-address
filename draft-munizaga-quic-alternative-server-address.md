@@ -33,6 +33,7 @@ normative:
 
 
 informative:
+  I-D.ietf-quic-multipath:
 
 --- abstract
 
@@ -211,7 +212,8 @@ that the server has enough connection IDs to probe new paths.
 # Interaction with the Multipath Extension for QUIC
 
 This extension complements the Multipath extension for QUIC by allowing the
-server to contribute more information to the client for alternative paths.
+server to contribute more information to the client for alternative paths
+({{I-D.ietf-quic-multipath}}).
 
 # Security Considerations
 
