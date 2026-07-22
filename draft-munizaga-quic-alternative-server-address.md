@@ -39,7 +39,8 @@ informative:
 
 This document specifies an extension to QUIC that allows a server to advertise
 a prioritized set of alternative addresses. This allows a client to migrate the
-connection as the availability or preference of server addresses changes.
+connection as the availability of, or preference among, server addresses
+changes.
 
 --- middle
 
@@ -51,9 +52,9 @@ available paths ({{Section 9 of RFC9000}}). A server can advertise a preferred
 address during the handshake ({{Section 9.6 of RFC9000}}), but cannot update
 that address or advertise additional addresses during the connection.
 
-Some deployments have multiple server addresses whose availability or preference
-can change over the lifetime of a connection. These include multihomed
-endpoints, relays, proxies, and peer-to-peer systems.
+Some deployments have multiple server addresses whose availability or relative
+preference can change over the lifetime of a connection. These include
+multihomed endpoints, relays, proxies, and peer-to-peer systems.
 
 This document defines an extension that allows a server to advertise a
 prioritized and replaceable set of alternative addresses. The client remains
@@ -122,7 +123,7 @@ ALTERNATIVE_ADDRESS Frame {
 }
 ~~~
 
-The Entry Count field contains the number of Address Entry fields in the frame.
+The Entry Count field contains the number of Address Entries in the frame.
 An Address Entry starts with a variable-length integer Address Type and has one
 of the following formats:
 
@@ -157,9 +158,9 @@ the same value to every entry.
 The CURRENT_PATH entry is a sentinel representing the server address of the
 current path and carries no priority hint, address, or port. A frame MUST contain
 exactly one CURRENT_PATH entry and MUST contain each IP address and port tuple at
-most once. Receipt of a frame that violates these requirements, does not order
-entries as required, or contains an unknown Address Type MUST be treated as a
-connection error of type FRAME_ENCODING_ERROR.
+most once. Receipt of a frame that fails either of these requirements, does not
+order entries as required, or contains an unknown Address Type MUST be treated
+as a connection error of type FRAME_ENCODING_ERROR.
 
 IPV4 and IPV6 entries before CURRENT_PATH have higher priority than the current
 path. The client SHOULD promptly validate these addresses and migrate to a
@@ -179,7 +180,7 @@ frames are received out of order. An address omitted from the newer frame is no
 longer advertised by this extension. The client SHOULD stop probing or using a
 non-current path associated with an address that is no longer advertised.
 
-ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST only be sent in the
+ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST be sent only in the
 application data packet number space.
 
 ## Address Selection and Reachability
@@ -223,10 +224,10 @@ well.
 
 ## DDoS - Thundering herd
 
-A malicious server could wait until it has received a large number of clients,
-and request a migration from all of them at the same time to a victim endpoint.
-If the clients all migrate at the same time, they may overload or otherwise
-negatively impact the victim endpoint.
+A malicious server could establish connections with a large number of clients
+and advertise a victim endpoint as a higher-priority alternative to all of them
+at the same time. If the clients all migrate at the same time, they may overload
+or otherwise negatively impact the victim endpoint.
 
 Clients may mitigate this by randomly delaying the migration.
 
