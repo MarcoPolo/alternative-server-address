@@ -1177,7 +1177,7 @@ connection as the availability or preference of server addresses changes.<a href
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-connection-id-management" class="internal xref">Connection ID Management</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-interaction-with-the-multip" class="internal xref">Interaction with the Multipath Extension for QUIC</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-interaction-with-managing-m" class="internal xref">Interaction with Managing Multiple Paths for a QUIC Connection</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
@@ -1406,14 +1406,14 @@ frames with an ALTERNATIVE_ADDRESS frame. Likewise, the client <span class="bcp1
 that the server has enough connection IDs to probe new paths.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="interaction-with-the-multipath-extension-for-quic">
+<div id="interaction-with-managing-multiple-paths-for-a-quic-connection">
 <section id="section-7">
-      <h2 id="name-interaction-with-the-multip">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-interaction-with-the-multip" class="section-name selfRef">Interaction with the Multipath Extension for QUIC</a>
+      <h2 id="name-interaction-with-managing-m">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-interaction-with-managing-m" class="section-name selfRef">Interaction with Managing Multiple Paths for a QUIC Connection</a>
       </h2>
-<p id="section-7-1">This extension complements the Multipath extension for QUIC by allowing the
-server to contribute more information to the client for alternative paths
-(<span>[<a href="#I-D.ietf-quic-multipath" class="cite xref">I-D.ietf-quic-multipath</a>]</span>).<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">The mechanism described in <span>[<a href="#I-D.ietf-quic-multipath" class="cite xref">I-D.ietf-quic-multipath</a>]</span> enables a QUIC connection
+to use multiple paths simultaneously. This extension complements that mechanism
+by allowing the server to advertise addresses for alternative paths.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">

@@ -76,7 +76,7 @@ Table of Contents
    5.  Alternative Address Frame
      5.1.  Address Selection and Reachability
    6.  Connection ID Management
-   7.  Interaction with the Multipath Extension for QUIC
+   7.  Interaction with Managing Multiple Paths for a QUIC Connection
    8.  Security Considerations
      8.1.  Request Forgery Attacks
      8.2.  DDoS - Thundering herd
@@ -271,11 +271,12 @@ Table of Contents
    frame.  Likewise, the client SHOULD ensure that the server has enough
    connection IDs to probe new paths.
 
-7.  Interaction with the Multipath Extension for QUIC
+7.  Interaction with Managing Multiple Paths for a QUIC Connection
 
-   This extension complements the Multipath extension for QUIC by
-   allowing the server to contribute more information to the client for
-   alternative paths ([I-D.ietf-quic-multipath]).
+   The mechanism described in [I-D.ietf-quic-multipath] enables a QUIC
+   connection to use multiple paths simultaneously.  This extension
+   complements that mechanism by allowing the server to advertise
+   addresses for alternative paths.
 
 8.  Security Considerations
 
