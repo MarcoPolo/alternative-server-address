@@ -190,11 +190,11 @@ does not imply reachability from the client. A server SHOULD limit the
 advertised set to addresses that it has reason to believe might be reachable,
 and SHOULD update the set when it learns that an address is no longer usable.
 
-Advertised addresses can include private-use, unique-local, or other
-limited-scope addresses. A client MAY decline to probe an address according to
-local policy. A client MUST successfully validate a path before sending
-non-probing frames on it. The request forgery considerations in Sections 21.5.3
-and 21.5.6 of {{RFC9000}} apply.
+Advertised addresses can include private-use IPv4 addresses, unique local IPv6
+unicast addresses, and other addresses with limited scope. A client MAY decline
+to probe an address according to local policy. A client MUST successfully
+validate a path before sending non-probing frames on it. The request forgery
+considerations in Sections 21.5.3 and 21.5.6 of {{RFC9000}} apply.
 
 # Connection ID Management
 
