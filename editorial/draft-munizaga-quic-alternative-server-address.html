@@ -1052,7 +1052,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Munizaga &amp; Seemann</td>
-<td class="center">Expires 23 January 2027</td>
+<td class="center">Expires 24 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,12 +1065,12 @@ svg {
 <dd class="internet-draft">draft-munizaga-quic-alternative-server-address-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-07-22" class="published">22 July 2026</time>
+<time datetime="2026-07-23" class="published">23 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-01-23">23 January 2027</time></dd>
+<dd class="expires"><time datetime="2027-01-24">24 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1126,7 +1126,7 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 23 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 24 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1179,7 +1179,7 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-connection-id-management" class="internal xref">Connection ID Management</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-interaction-with-the-multip" class="internal xref">Interaction with the Multipath Extension for QUIC</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-interaction-with-managing-m" class="internal xref">Interaction with Managing Multiple Paths for a QUIC Connection</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
@@ -1204,7 +1204,15 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
             <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
@@ -1256,14 +1264,14 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-negotiating-extension-use">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-negotiating-extension-use" class="section-name selfRef">Negotiating Extension Use</a>
       </h2>
-<p id="section-3-1">alternative_address (0xff0969d85c):<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">Clients advertise their support of this extension by sending the
+<p id="section-3-1">Clients advertise their support of this extension by sending the
 alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) with an empty value. Sending this transport parameter signals
-to the server that the client understands the ALTERNATIVE_ADDRESS frame.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
+to the server that the client understands the ALTERNATIVE_ADDRESS frame.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
 extension and receives this transport parameter <span class="bcp14">MUST</span> abort the connection with a
-TRANSPORT_PARAMETER_ERROR.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">Endpoints <span class="bcp14">MUST NOT</span> remember the value of this extension for 0-RTT.<a href="#section-3-4" class="pilcrow">¶</a></p>
+TRANSPORT_PARAMETER_ERROR.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">A server <span class="bcp14">MUST NOT</span> remember a client's use of this transport parameter for 0-RTT
+in a subsequent connection.<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="path-validation">
@@ -1313,23 +1321,23 @@ ALTERNATIVE_ADDRESS Frame {
 </pre><a href="#section-5-3" class="pilcrow">¶</a>
 </div>
 <p id="section-5-4">The Entry Count field contains the number of Address Entries in the frame.
-An Address Entry starts with an 8-bit Address Type and has one of the following
-formats:<a href="#section-5-4" class="pilcrow">¶</a></p>
+An Address Entry starts with a variable-length integer Address Type and has one
+of the following formats:<a href="#section-5-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-5">
 <pre>
 CURRENT_PATH Entry {
-  Address Type (8) = 0x00,
+  Address Type (i) = 0x00,
 }
 
 IPV4 Entry {
-  Address Type (8) = 0x01,
+  Address Type (i) = 0x01,
   Priority Hint (i),
   IPv4 Address (32),
   IPv4 Port (16),
 }
 
 IPV6 Entry {
-  Address Type (8) = 0x02,
+  Address Type (i) = 0x02,
   Priority Hint (i),
   IPv6 Address (128),
   IPv6 Port (16),
@@ -1376,11 +1384,11 @@ outside the scope of this document. An advertised address is a candidate and
 does not imply reachability from the client. A server <span class="bcp14">SHOULD</span> limit the
 advertised set to addresses that it has reason to believe might be reachable,
 and <span class="bcp14">SHOULD</span> update the set when it learns that an address is no longer usable.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">Advertised addresses can include private-use, unique-local, or other
-limited-scope addresses. A client <span class="bcp14">MAY</span> decline to probe an address according to
-local policy. A client <span class="bcp14">MUST</span> successfully validate a path before sending
-non-probing frames on it. The request forgery considerations in Sections 21.5.3
-and 21.5.6 of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> apply.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Advertised addresses can include private-use IPv4 addresses, unique local IPv6
+unicast addresses, and other addresses with limited scope. A client <span class="bcp14">MAY</span> decline
+to probe an address according to local policy. A client <span class="bcp14">MUST</span> successfully
+validate a path before sending non-probing frames on it. The request forgery
+considerations in Sections 21.5.3 and 21.5.6 of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> apply.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1400,13 +1408,14 @@ frames with an ALTERNATIVE_ADDRESS frame. Likewise, the client <span class="bcp1
 that the server has enough connection IDs to probe new paths.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="interaction-with-the-multipath-extension-for-quic">
+<div id="interaction-with-managing-multiple-paths-for-a-quic-connection">
 <section id="section-7">
-      <h2 id="name-interaction-with-the-multip">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-interaction-with-the-multip" class="section-name selfRef">Interaction with the Multipath Extension for QUIC</a>
+      <h2 id="name-interaction-with-managing-m">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-interaction-with-managing-m" class="section-name selfRef">Interaction with Managing Multiple Paths for a QUIC Connection</a>
       </h2>
-<p id="section-7-1">This extension complements the Multipath extension for QUIC by allowing the
-server to contribute more information to the client for alternative paths.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">The mechanism described in <span>[<a href="#I-D.ietf-quic-multipath" class="cite xref">I-D.ietf-quic-multipath</a>]</span> enables a QUIC connection
+to use multiple paths simultaneously. This extension complements that mechanism
+by allowing the server to advertise addresses for alternative paths.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -1527,25 +1536,45 @@ registered:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="sec-normative-references">
+<div id="sec-combined-references">
 <section id="section-10">
-      <h2 id="name-normative-references">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      <h2 id="name-references">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-10.1">
+        <h3 id="name-normative-references">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9000">[RFC9000]</dt>
-    <dd>
+      <dd>
 <span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-10.2">
+        <h3 id="name-informative-references">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="I-D.ietf-quic-multipath">[I-D.ietf-quic-multipath]</dt>
+      <dd>
+<span class="refAuthor">Liu, Y.</span>, <span class="refAuthor">Ma, Y.</span>, <span class="refAuthor">De Coninck, Q.</span>, <span class="refAuthor">Bonaventure, O.</span>, <span class="refAuthor">Huitema, C.</span>, and <span class="refAuthor">M. Kühlewind</span>, <span class="refTitle">"Managing multiple paths for a QUIC connection"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-multipath-21</span>, <time datetime="2026-03-17" class="refDate">17 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-21">https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-21</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
 </section>
 </div>
 <div id="acknowledgments">
