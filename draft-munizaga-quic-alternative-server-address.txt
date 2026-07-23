@@ -122,8 +122,6 @@ Table of Contents
 
 3.  Negotiating Extension Use
 
-   alternative_address (0xff0969d85c):
-
    Clients advertise their support of this extension by sending the
    alternative_address (0xff0969d85c) transport parameter (Section 7.4
    of [RFC9000]) with an empty value.  Sending this transport parameter
@@ -134,7 +132,8 @@ Table of Contents
    supports this extension and receives this transport parameter MUST
    abort the connection with a TRANSPORT_PARAMETER_ERROR.
 
-   Endpoints MUST NOT remember the value of this extension for 0-RTT.
+   A server MUST NOT remember a client's use of this transport parameter
+   for 0-RTT in a subsequent connection.
 
 4.  Path Validation
 
@@ -251,11 +250,12 @@ Table of Contents
    it has reason to believe might be reachable, and SHOULD update the
    set when it learns that an address is no longer usable.
 
-   Advertised addresses can include private-use, unique-local, or other
-   limited-scope addresses.  A client MAY decline to probe an address
-   according to local policy.  A client MUST successfully validate a
-   path before sending non-probing frames on it.  The request forgery
-   considerations in Sections 21.5.3 and 21.5.6 of [RFC9000] apply.
+   Advertised addresses can include private-use IPv4 addresses, unique
+   local IPv6 unicast addresses, and other addresses with limited scope.
+   A client MAY decline to probe an address according to local policy.
+   A client MUST successfully validate a path before sending non-probing
+   frames on it.  The request forgery considerations in Sections 21.5.3
+   and 21.5.6 of [RFC9000] apply.
 
 6.  Connection ID Management
 

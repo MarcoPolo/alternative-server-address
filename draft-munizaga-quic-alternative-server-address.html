@@ -1262,14 +1262,14 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-negotiating-extension-use">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-negotiating-extension-use" class="section-name selfRef">Negotiating Extension Use</a>
       </h2>
-<p id="section-3-1">alternative_address (0xff0969d85c):<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">Clients advertise their support of this extension by sending the
+<p id="section-3-1">Clients advertise their support of this extension by sending the
 alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) with an empty value. Sending this transport parameter signals
-to the server that the client understands the ALTERNATIVE_ADDRESS frame.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
+to the server that the client understands the ALTERNATIVE_ADDRESS frame.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
 extension and receives this transport parameter <span class="bcp14">MUST</span> abort the connection with a
-TRANSPORT_PARAMETER_ERROR.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">Endpoints <span class="bcp14">MUST NOT</span> remember the value of this extension for 0-RTT.<a href="#section-3-4" class="pilcrow">¶</a></p>
+TRANSPORT_PARAMETER_ERROR.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">A server <span class="bcp14">MUST NOT</span> remember a client's use of this transport parameter for 0-RTT
+in a subsequent connection.<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="path-validation">
@@ -1382,11 +1382,11 @@ outside the scope of this document. An advertised address is a candidate and
 does not imply reachability from the client. A server <span class="bcp14">SHOULD</span> limit the
 advertised set to addresses that it has reason to believe might be reachable,
 and <span class="bcp14">SHOULD</span> update the set when it learns that an address is no longer usable.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">Advertised addresses can include private-use, unique-local, or other
-limited-scope addresses. A client <span class="bcp14">MAY</span> decline to probe an address according to
-local policy. A client <span class="bcp14">MUST</span> successfully validate a path before sending
-non-probing frames on it. The request forgery considerations in Sections 21.5.3
-and 21.5.6 of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> apply.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Advertised addresses can include private-use IPv4 addresses, unique local IPv6
+unicast addresses, and other addresses with limited scope. A client <span class="bcp14">MAY</span> decline
+to probe an address according to local policy. A client <span class="bcp14">MUST</span> successfully
+validate a path before sending non-probing frames on it. The request forgery
+considerations in Sections 21.5.3 and 21.5.6 of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> apply.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
