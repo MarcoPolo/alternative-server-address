@@ -33,6 +33,7 @@ normative:
 
 
 informative:
+  I-D.ietf-quic-multipath:
 
 --- abstract
 
@@ -208,10 +209,11 @@ an unused connection ID. The server MAY bundle one or more NEW_CONNECTION_ID
 frames with an ALTERNATIVE_ADDRESS frame. Likewise, the client SHOULD ensure
 that the server has enough connection IDs to probe new paths.
 
-# Interaction with the Multipath Extension for QUIC
+# Interaction with Managing Multiple Paths for a QUIC Connection
 
-This extension complements the Multipath extension for QUIC by allowing the
-server to contribute more information to the client for alternative paths.
+The mechanism described in {{I-D.ietf-quic-multipath}} enables a QUIC connection
+to use multiple paths simultaneously. This extension complements that mechanism
+by allowing the server to advertise addresses for alternative paths.
 
 # Security Considerations
 
