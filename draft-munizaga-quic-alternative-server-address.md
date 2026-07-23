@@ -69,8 +69,6 @@ out of scope of this document.
 
 # Negotiating Extension Use
 
-alternative_address (0xff0969d85c):
-
 Clients advertise their support of this extension by sending the
 alternative_address (0xff0969d85c) transport parameter ({{Section 7.4 of
 RFC9000}}) with an empty value. Sending this transport parameter signals
@@ -80,7 +78,8 @@ Servers MUST NOT send this transport parameter. A client that supports this
 extension and receives this transport parameter MUST abort the connection with a
 TRANSPORT_PARAMETER_ERROR.
 
-Endpoints MUST NOT remember the value of this extension for 0-RTT.
+A server MUST NOT remember a client's use of this transport parameter for 0-RTT
+in a subsequent connection.
 
 # Path Validation
 
