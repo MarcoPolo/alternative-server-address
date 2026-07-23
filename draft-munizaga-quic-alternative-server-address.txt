@@ -5,7 +5,7 @@
 QUIC                                                         M. Munizaga
 Internet-Draft                                       Ethereum Foundation
 Intended status: Standards Track                              M. Seemann
-Expires: 22 January 2027                                    21 July 2026
+Expires: 24 January 2027                                    23 July 2026
 
 
                  QUIC Alternative Server Address Frames
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 January 2027.
+   This Internet-Draft will expire on 24 January 2027.
 
 Copyright Notice
 
@@ -76,14 +76,16 @@ Table of Contents
    5.  Alternative Address Frame
      5.1.  Address Selection and Reachability
    6.  Connection ID Management
-   7.  Interaction with the Multipath Extension for QUIC
+   7.  Interaction with Managing Multiple Paths for a QUIC Connection
    8.  Security Considerations
      8.1.  Request Forgery Attacks
      8.2.  DDoS - Thundering herd
    9.  IANA Considerations
      9.1.  QUIC Transport Parameter
      9.2.  QUIC Frame Types
-   10. Normative References
+   10. References
+     10.1.  Normative References
+     10.2.  Informative References
    Acknowledgments
    Questions
    Authors' Addresses
@@ -269,11 +271,12 @@ Table of Contents
    frame.  Likewise, the client SHOULD ensure that the server has enough
    connection IDs to probe new paths.
 
-7.  Interaction with the Multipath Extension for QUIC
+7.  Interaction with Managing Multiple Paths for a QUIC Connection
 
-   This extension complements the Multipath extension for QUIC by
-   allowing the server to contribute more information to the client for
-   alternative paths.
+   The mechanism described in [I-D.ietf-quic-multipath] enables a QUIC
+   connection to use multiple paths simultaneously.  This extension
+   complements that mechanism by allowing the server to advertise
+   addresses for alternative paths.
 
 8.  Security Considerations
 
@@ -329,7 +332,9 @@ Table of Contents
 
    Contact:  Marco Munizaga (marco@marcopolo.io)
 
-10.  Normative References
+10.  References
+
+10.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -344,6 +349,16 @@ Table of Contents
               Multiplexed and Secure Transport", RFC 9000,
               DOI 10.17487/RFC9000, May 2021,
               <https://www.rfc-editor.org/rfc/rfc9000>.
+
+10.2.  Informative References
+
+   [I-D.ietf-quic-multipath]
+              Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
+              C., and M. Kühlewind, "Managing multiple paths for a QUIC
+              connection", Work in Progress, Internet-Draft, draft-ietf-
+              quic-multipath-21, 17 March 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              multipath-21>.
 
 Acknowledgments
 
