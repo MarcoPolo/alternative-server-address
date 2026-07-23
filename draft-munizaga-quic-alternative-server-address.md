@@ -246,7 +246,8 @@ Parameter Name:
 : alternative_address
 
 Status:
-: Provisional
+: Provisional (note that, prior to publication, the value will be replaced by a
+  new value that encodes in two bytes)
 
 Specification:
 : This document
@@ -270,7 +271,8 @@ Frame Type Name:
 : ALTERNATIVE_ADDRESS
 
 Status:
-: Provisional
+: Provisional (note that, prior to publication, the value will be replaced by a
+  new value that encodes in two bytes)
 
 Specification:
 : This document
