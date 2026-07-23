@@ -10,7 +10,8 @@
 <meta content="
        This document specifies an extension to QUIC that allows a server to advertise
 a prioritized set of alternative addresses. This allows a client to migrate the
-connection as the availability or preference of server addresses changes. 
+connection as the availability of, or preference among, server addresses
+changes. 
     " name="description">
 <meta content="xml2rfc 3.34.0" name="generator">
 <meta content="Internet-Draft" name="keyword">
@@ -1087,7 +1088,8 @@ svg {
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document specifies an extension to QUIC that allows a server to advertise
 a prioritized set of alternative addresses. This allows a client to migrate the
-connection as the availability or preference of server addresses changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+connection as the availability of, or preference among, server addresses
+changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1235,9 +1237,9 @@ survive changes to the client's address and enabling the client to select among
 available paths (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-9" class="relref">Section 9</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). A server can advertise a preferred
 address during the handshake (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-9.6" class="relref">Section 9.6</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>), but cannot update
 that address or advertise additional addresses during the connection.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">Some deployments have multiple server addresses whose availability or preference
-can change over the lifetime of a connection. These include multihomed
-endpoints, relays, proxies, and peer-to-peer systems.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-2">Some deployments have multiple server addresses whose availability or relative
+preference can change over the lifetime of a connection. These include
+multihomed endpoints, relays, proxies, and peer-to-peer systems.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document defines an extension that allows a server to advertise a
 prioritized and replaceable set of alternative addresses. The client remains
 responsible for validating these addresses and initiating any connection
@@ -1318,7 +1320,7 @@ ALTERNATIVE_ADDRESS Frame {
 }
 </pre><a href="#section-5-3" class="pilcrow">¶</a>
 </div>
-<p id="section-5-4">The Entry Count field contains the number of Address Entry fields in the frame.
+<p id="section-5-4">The Entry Count field contains the number of Address Entries in the frame.
 An Address Entry starts with a variable-length integer Address Type and has one
 of the following formats:<a href="#section-5-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-5">
@@ -1352,9 +1354,9 @@ the same value to every entry.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7">The CURRENT_PATH entry is a sentinel representing the server address of the
 current path and carries no priority hint, address, or port. A frame <span class="bcp14">MUST</span> contain
 exactly one CURRENT_PATH entry and <span class="bcp14">MUST</span> contain each IP address and port tuple at
-most once. Receipt of a frame that violates these requirements, does not order
-entries as required, or contains an unknown Address Type <span class="bcp14">MUST</span> be treated as a
-connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
+most once. Receipt of a frame that fails either of these requirements, does not
+order entries as required, or contains an unknown Address Type <span class="bcp14">MUST</span> be treated
+as a connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <p id="section-5-8">IPV4 and IPV6 entries before CURRENT_PATH have higher priority than the current
 path. The client <span class="bcp14">SHOULD</span> promptly validate these addresses and migrate to a
 validated address. Entries after CURRENT_PATH are backup addresses. The client
@@ -1370,7 +1372,7 @@ Therefore, a newer frame atomically replaces an older address set even if the
 frames are received out of order. An address omitted from the newer frame is no
 longer advertised by this extension. The client <span class="bcp14">SHOULD</span> stop probing or using a
 non-current path associated with an address that is no longer advertised.<a href="#section-5-10" class="pilcrow">¶</a></p>
-<p id="section-5-11">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> only be sent in the
+<p id="section-5-11">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> be sent only in the
 application data packet number space.<a href="#section-5-11" class="pilcrow">¶</a></p>
 <div id="address-selection-and-reachability">
 <section id="section-5.1">
@@ -1435,10 +1437,10 @@ well.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
         <h3 id="name-ddos-thundering-herd">
 <a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-ddos-thundering-herd" class="section-name selfRef">DDoS - Thundering herd</a>
         </h3>
-<p id="section-8.2-1">A malicious server could wait until it has received a large number of clients,
-and request a migration from all of them at the same time to a victim endpoint.
-If the clients all migrate at the same time, they may overload or otherwise
-negatively impact the victim endpoint.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-1">A malicious server could establish connections with a large number of clients
+and advertise a victim endpoint as a higher-priority alternative to all of them
+at the same time. If the clients all migrate at the same time, they may overload
+or otherwise negatively impact the victim endpoint.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <p id="section-8.2-2">Clients may mitigate this by randomly delaying the migration.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
