@@ -179,22 +179,22 @@ Table of Contents
    }
 
    The Entry Count field contains the number of Address Entry fields in
-   the frame.  An Address Entry starts with an 8-bit Address Type and
-   has one of the following formats:
+   the frame.  An Address Entry starts with a variable-length integer
+   Address Type and has one of the following formats:
 
    CURRENT_PATH Entry {
-     Address Type (8) = 0x00,
+     Address Type (i) = 0x00,
    }
 
    IPV4 Entry {
-     Address Type (8) = 0x01,
+     Address Type (i) = 0x01,
      Priority Hint (i),
      IPv4 Address (32),
      IPv4 Port (16),
    }
 
    IPV6 Entry {
-     Address Type (8) = 0x02,
+     Address Type (i) = 0x02,
      Priority Hint (i),
      IPv6 Address (128),
      IPv6 Port (16),
