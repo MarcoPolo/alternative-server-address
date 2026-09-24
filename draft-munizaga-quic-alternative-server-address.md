@@ -30,9 +30,6 @@ author:
 
 normative:
   RFC9000:
-
-
-informative:
   I-D.ietf-quic-multipath:
 
 --- abstract
@@ -107,9 +104,8 @@ source address or make that address eligible for migration.
 # Alternative Address Frame
 
 A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete set of
-alternative addresses and their priority relative to the current path. Each
-frame replaces the state established by any previously processed
-ALTERNATIVE_ADDRESS frame.
+alternative addresses and their priority hints. Each frame replaces the state
+established by any previously processed ALTERNATIVE_ADDRESS frame.
 
 The frame uses the following format, following the conventions described in
 {{Section 12.4 of RFC9000}}:
@@ -155,18 +151,18 @@ values have meaning only relative to other values on the same side of the
 CURRENT_PATH entry; values on opposite sides are unrelated. A server can assign
 the same value to every entry.
 
-The CURRENT_PATH entry is a sentinel representing the server address of the
-current path and carries no priority hint, address, or port. A frame MUST contain
-exactly one CURRENT_PATH entry and MUST contain each IP address and port tuple at
-most once. Receipt of a frame that fails either of these requirements, does not
-order entries as required, or contains an unknown Address Type MUST be treated
-as a connection error of type FRAME_ENCODING_ERROR.
+The CURRENT_PATH entry is a sentinel that separates the address entries into two
+sets. A frame MUST contain exactly one CURRENT_PATH entry and MUST contain each
+IP address and port tuple at most once. Receipt of a frame that fails either of
+these requirements, does not order entries as required, or contains an unknown
+Address Type MUST be treated as a connection error of type FRAME_ENCODING_ERROR.
 
-IPV4 and IPV6 entries before CURRENT_PATH have higher priority than the current
-path. The client SHOULD promptly validate these addresses and migrate to a
-validated address. Entries after CURRENT_PATH are backup addresses. The client
-MAY validate paths to these addresses, but SHOULD NOT migrate to one solely
-because it was advertised.
+When multipath has not been negotiated, entries before CURRENT_PATH have higher
+priority than the current path. The client SHOULD promptly validate these
+addresses and migrate to a validated address. Entries after CURRENT_PATH are
+backup addresses. The client MAY validate paths to these addresses, but SHOULD
+NOT migrate to one solely because it was advertised. The corresponding behavior
+when multipath has been negotiated is described in {{multipath}}.
 
 Priority hints are advisory. A client MAY use them to decide which addresses to
 validate, which validations to perform in parallel, and which validated address
@@ -209,11 +205,21 @@ an unused connection ID. The server MAY bundle one or more NEW_CONNECTION_ID
 frames with an ALTERNATIVE_ADDRESS frame. Likewise, the client SHOULD ensure
 that the server has enough connection IDs to probe new paths.
 
-# Interaction with Managing Multiple Paths for a QUIC Connection
+# Interaction with Managing Multiple Paths for a QUIC Connection {#multipath}
 
 The mechanism described in {{I-D.ietf-quic-multipath}} enables a QUIC connection
 to use multiple paths simultaneously. This extension complements that mechanism
 by allowing the server to advertise addresses for alternative paths.
+
+When multipath has been negotiated, the client SHOULD promptly establish paths
+to addresses in IPV4 and IPV6 entries before CURRENT_PATH, as described in
+{{Section 3.1 of I-D.ietf-quic-multipath}}. The endpoints' multipath scheduling
+and path management determine how these paths are used and whether they
+supplement or replace existing paths.
+
+Entries after CURRENT_PATH remain backup addresses. The client MAY validate
+paths to these addresses, but SHOULD NOT start using them for application data
+solely because they were advertised.
 
 # Security Considerations
 
