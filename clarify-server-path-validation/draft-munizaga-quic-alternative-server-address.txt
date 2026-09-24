@@ -123,7 +123,7 @@ Table of Contents
 
    Clients advertise support for ALTERNATIVE_ADDRESS frames by sending
    the alternative_address (0xff0969d85c) transport parameter
-   (Section 7.4 of [RFC9000]).  CURRENT_PATH, IPV4, and IPV6 are
+   (Section 7.4 of [RFC9000]).  CURRENT_PATH, IPv4, and IPv6 are
    implicitly supported.  The value is a possibly empty sequence of QUIC
    variable-length integers (Section 16 of [RFC9000]) listing additional
    supported Address Types, read to the end of the parameter value.
@@ -197,14 +197,14 @@ Table of Contents
      Address Type (i) = 0x00,
    }
 
-   IPV4 Entry {
+   IPv4 Entry {
      Address Type (i) = 0x01,
      Priority Hint (i),
      IPv4 Address (32),
      IPv4 Port (16),
    }
 
-   IPV6 Entry {
+   IPv6 Entry {
      Address Type (i) = 0x02,
      Priority Hint (i),
      IPv6 Address (128),
@@ -292,7 +292,7 @@ Table of Contents
    addresses for alternative paths.
 
    When multipath has been negotiated, the client SHOULD promptly
-   establish paths to addresses in IPV4 and IPV6 entries before
+   establish paths to addresses in IPv4 and IPv6 entries before
    CURRENT_PATH, as described in Section 3.1 of
    [I-D.ietf-quic-multipath].  The endpoints' multipath scheduling and
    path management determine how these paths are used and whether they
@@ -374,9 +374,9 @@ Table of Contents
                +=======+===================+===============+
                | 0x00  | CURRENT_PATH      | Section 5     |
                +-------+-------------------+---------------+
-               | 0x01  | IPV4              | Section 5     |
+               | 0x01  | IPv4              | Section 5     |
                +-------+-------------------+---------------+
-               | 0x02  | IPV6              | Section 5     |
+               | 0x02  | IPv6              | Section 5     |
                +-------+-------------------+---------------+
 
                                   Table 1

@@ -1257,7 +1257,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-negotiating-extension-use" class="section-name selfRef">Negotiating Extension Use</a>
       </h2>
 <p id="section-3-1">Clients advertise support for ALTERNATIVE_ADDRESS frames by sending the
-alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). CURRENT_PATH, IPV4, and IPV6 are implicitly supported. The value is
+alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). CURRENT_PATH, IPv4, and IPv6 are implicitly supported. The value is
 a possibly empty sequence of QUIC variable-length integers (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) listing additional supported Address Types, read to the end of the
 parameter value. Values <span class="bcp14">MUST</span> be ordered and <span class="bcp14">MUST NOT</span> contain duplicates.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">Servers <span class="bcp14">MUST</span> ignore unknown Address Types in the list and <span class="bcp14">MUST</span> treat a truncated
@@ -1329,14 +1329,14 @@ CURRENT_PATH Entry {
   Address Type (i) = 0x00,
 }
 
-IPV4 Entry {
+IPv4 Entry {
   Address Type (i) = 0x01,
   Priority Hint (i),
   IPv4 Address (32),
   IPv4 Port (16),
 }
 
-IPV6 Entry {
+IPv6 Entry {
   Address Type (i) = 0x02,
   Priority Hint (i),
   IPv6 Address (128),
@@ -1417,7 +1417,7 @@ that the server has enough connection IDs to probe new paths.<a href="#section-6
 to use multiple paths simultaneously. This extension complements that mechanism
 by allowing the server to advertise addresses for alternative paths.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">When multipath has been negotiated, the client <span class="bcp14">SHOULD</span> promptly establish paths
-to addresses in IPV4 and IPV6 entries before CURRENT_PATH, as described in
+to addresses in IPv4 and IPv6 entries before CURRENT_PATH, as described in
 <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-21#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.ietf-quic-multipath" class="cite xref">I-D.ietf-quic-multipath</a>]</span>. The endpoints' multipath scheduling
 and path management determine how these paths are used and whether they
 supplement or replace existing paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
@@ -1573,14 +1573,14 @@ Type Name field containing a short mnemonic.<a href="#section-9.3-1" class="pilc
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">0x01</td>
-              <td class="text-left" rowspan="1" colspan="1">IPV4</td>
+              <td class="text-left" rowspan="1" colspan="1">IPv4</td>
               <td class="text-left" rowspan="1" colspan="1">
                 <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
 </td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">0x02</td>
-              <td class="text-left" rowspan="1" colspan="1">IPV6</td>
+              <td class="text-left" rowspan="1" colspan="1">IPv6</td>
               <td class="text-left" rowspan="1" colspan="1">
                 <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
 </td>
