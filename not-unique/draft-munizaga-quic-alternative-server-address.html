@@ -1049,7 +1049,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Munizaga &amp; Seemann</td>
-<td class="center">Expires 24 March 2027</td>
+<td class="center">Expires 29 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg {
 <dd class="internet-draft">draft-munizaga-quic-alternative-server-address-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-20" class="published">20 September 2026</time>
+<time datetime="2026-09-25" class="published">25 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-24">24 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-29">29 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1123,7 +1123,7 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 24 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1198,18 +1198,13 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
                 <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-quic-frame-types" class="internal xref">QUIC Frame Types</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-quic-alternative-address-ty" class="internal xref">QUIC Alternative Address Types</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
-                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
-                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
             <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
@@ -1256,19 +1251,25 @@ described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</s
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="negotiating-extension-use">
+<div id="negotiation">
 <section id="section-3">
       <h2 id="name-negotiating-extension-use">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-negotiating-extension-use" class="section-name selfRef">Negotiating Extension Use</a>
       </h2>
-<p id="section-3-1">Clients advertise their support of this extension by sending the
-alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) with an empty value. Sending this transport parameter signals
-to the server that the client understands the ALTERNATIVE_ADDRESS frame.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
+<p id="section-3-1">Clients advertise support for ALTERNATIVE_ADDRESS frames by sending the
+alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). CURRENT_PATH, IPv4, and IPv6 are implicitly supported. The value is
+a possibly empty sequence of QUIC variable-length integers (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) listing additional supported Address Types, read to the end of the
+parameter value. Values <span class="bcp14">MUST</span> be ordered and <span class="bcp14">MUST NOT</span> contain duplicates.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">Servers <span class="bcp14">MUST</span> ignore unknown Address Types in the list and <span class="bcp14">MUST</span> treat a truncated
+integer as a connection error of type TRANSPORT_PARAMETER_ERROR.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">Servers <span class="bcp14">MUST NOT</span> send ALTERNATIVE_ADDRESS frames without this transport
+parameter or include Address Types that the client has not explicitly or
+implicitly advertised.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
 extension and receives this transport parameter <span class="bcp14">MUST</span> abort the connection with a
-TRANSPORT_PARAMETER_ERROR.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">A server <span class="bcp14">MUST NOT</span> remember a client's use of this transport parameter for 0-RTT
-in a subsequent connection.<a href="#section-3-3" class="pilcrow">¶</a></p>
+TRANSPORT_PARAMETER_ERROR.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-3-5">A server <span class="bcp14">MUST NOT</span> remember a client's use of this transport parameter for 0-RTT
+in a subsequent connection.<a href="#section-3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="path-validation">
@@ -1288,8 +1289,9 @@ address other than the address being validated. <span><a href="https://rfc-edito
 requires the server to send the PATH_RESPONSE on the path where it received the
 PATH_CHALLENGE, but prohibits the client from enforcing this requirement. A
 matching PATH_RESPONSE received on any path validates the path on which the
-PATH_CHALLENGE was sent (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-8.2.3" class="relref">Section 8.2.3</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). The server might also
-send a PATH_CHALLENGE to validate the path in its sending direction.
+PATH_CHALLENGE was sent (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-8.2.3" class="relref">Section 8.2.3</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). The server <span class="bcp14">MUST</span> also
+validate the path in its sending direction before sending non-probing packets
+on that path, following <span><a href="https://rfc-editor.org/rfc/rfc9000#section-9.6.2" class="relref">Section 9.6.2</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>.
 Consequently, while validating an advertised address, a client <span class="bcp14">MUST NOT</span> discard
 a successfully authenticated probing packet solely because it was received from
 an unadvertised server address. Processing the packet does not validate its
@@ -1302,9 +1304,8 @@ source address or make that address eligible for migration.<a href="#section-4-2
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-alternative-address-frame" class="section-name selfRef">Alternative Address Frame</a>
       </h2>
 <p id="section-5-1">A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete set of
-alternative addresses and their priority relative to the current path. Each
-frame replaces the state established by any previously processed
-ALTERNATIVE_ADDRESS frame.<a href="#section-5-1" class="pilcrow">¶</a></p>
+alternative addresses and their priority hints. Each frame replaces the state
+established by any previously processed ALTERNATIVE_ADDRESS frame.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">The frame uses the following format, following the conventions described in
 <span><a href="https://rfc-editor.org/rfc/rfc9000#section-12.4" class="relref">Section 12.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>:<a href="#section-5-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-3">
@@ -1318,22 +1319,24 @@ ALTERNATIVE_ADDRESS Frame {
 </pre><a href="#section-5-3" class="pilcrow">¶</a>
 </div>
 <p id="section-5-4">The Entry Count field contains the number of Address Entries in the frame.
-An Address Entry starts with a variable-length integer Address Type and has one
-of the following formats:<a href="#section-5-4" class="pilcrow">¶</a></p>
+An Address Entry starts with a variable-length integer Address Type
+(<a href="#iana-address-types" class="auto internal xref">Section 9.3</a>). Except for CURRENT_PATH, each entry <span class="bcp14">MUST</span> include a
+Priority Hint immediately after the Address Type. This document defines the
+following entry types:<a href="#section-5-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-5">
 <pre>
 CURRENT_PATH Entry {
   Address Type (i) = 0x00,
 }
 
-IPV4 Entry {
+IPv4 Entry {
   Address Type (i) = 0x01,
   Priority Hint (i),
   IPv4 Address (32),
   IPv4 Port (16),
 }
 
-IPV6 Entry {
+IPv6 Entry {
   Address Type (i) = 0x02,
   Priority Hint (i),
   IPv6 Address (128),
@@ -1348,16 +1351,16 @@ Entries on each side <span class="bcp14">MUST</span> appear in ascending Priorit
 values have meaning only relative to other values on the same side of the
 CURRENT_PATH entry; values on opposite sides are unrelated. A server can assign
 the same value to every entry.<a href="#section-5-6" class="pilcrow">¶</a></p>
-<p id="section-5-7">The CURRENT_PATH entry is a sentinel representing the server address of the
-current path and carries no priority hint, address, or port. A frame <span class="bcp14">MUST</span> contain
-exactly one CURRENT_PATH entry. Receipt of a frame that fails this requirement,
-does not order entries as required, or contains an unknown Address Type <span class="bcp14">MUST</span> be
-treated as a connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
-<p id="section-5-8">IPV4 and IPV6 entries before CURRENT_PATH have higher priority than the current
-path. The client <span class="bcp14">SHOULD</span> promptly validate these addresses and migrate to a
-validated address. Entries after CURRENT_PATH are backup addresses. The client
-<span class="bcp14">MAY</span> validate paths to these addresses, but <span class="bcp14">SHOULD NOT</span> migrate to one solely
-because it was advertised.<a href="#section-5-8" class="pilcrow">¶</a></p>
+<p id="section-5-7">The CURRENT_PATH entry is a sentinel that separates the address entries into two
+sets. A frame <span class="bcp14">MUST</span> contain exactly one CURRENT_PATH entry. Receipt of a frame
+that fails this requirement, does not order entries as required, or contains an
+unknown or unnegotiated Address Type (<a href="#negotiation" class="auto internal xref">Section 3</a>) <span class="bcp14">MUST</span> be treated as a
+connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-5-8">When multipath has not been negotiated, entries before CURRENT_PATH have higher
+priority than the current path. The client <span class="bcp14">SHOULD</span> promptly validate these
+addresses and migrate to a validated address. Entries after CURRENT_PATH are
+backup addresses. The client <span class="bcp14">MAY</span> validate paths to these addresses, but <span class="bcp14">SHOULD NOT</span> migrate to one solely because it was advertised. The corresponding behavior
+when multipath has been negotiated is described in <a href="#multipath" class="auto internal xref">Section 7</a>.<a href="#section-5-8" class="pilcrow">¶</a></p>
 <p id="section-5-9">Priority hints are advisory. A client <span class="bcp14">MAY</span> use them to decide which addresses to
 validate, which validations to perform in parallel, and which validated address
 to use. A client <span class="bcp14">MAY</span> disregard priority hints based on local policy.<a href="#section-5-9" class="pilcrow">¶</a></p>
@@ -1404,7 +1407,7 @@ frames with an ALTERNATIVE_ADDRESS frame. Likewise, the client <span class="bcp1
 that the server has enough connection IDs to probe new paths.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="interaction-with-managing-multiple-paths-for-a-quic-connection">
+<div id="multipath">
 <section id="section-7">
       <h2 id="name-interaction-with-managing-m">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-interaction-with-managing-m" class="section-name selfRef">Interaction with Managing Multiple Paths for a QUIC Connection</a>
@@ -1412,6 +1415,14 @@ that the server has enough connection IDs to probe new paths.<a href="#section-6
 <p id="section-7-1">The mechanism described in <span>[<a href="#I-D.ietf-quic-multipath" class="cite xref">I-D.ietf-quic-multipath</a>]</span> enables a QUIC connection
 to use multiple paths simultaneously. This extension complements that mechanism
 by allowing the server to advertise addresses for alternative paths.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">When multipath has been negotiated, the client <span class="bcp14">SHOULD</span> promptly establish paths
+to addresses in IPv4 and IPv6 entries before CURRENT_PATH, as described in
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-21#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.ietf-quic-multipath" class="cite xref">I-D.ietf-quic-multipath</a>]</span>. The endpoints' multipath scheduling
+and path management determine how these paths are used and whether they
+supplement or replace existing paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">Entries after CURRENT_PATH remain backup addresses. The client <span class="bcp14">MAY</span> validate
+paths to these addresses, but <span class="bcp14">SHOULD NOT</span> start using them for application data
+solely because they were advertised.<a href="#section-7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -1532,47 +1543,78 @@ new value that encodes in two bytes)<a href="#section-9.2-2.6.1" class="pilcrow"
 </dl>
 </section>
 </div>
+<div id="iana-address-types">
+<section id="section-9.3">
+        <h3 id="name-quic-alternative-address-ty">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-quic-alternative-address-ty" class="section-name selfRef">QUIC Alternative Address Types</a>
+        </h3>
+<p id="section-9.3-1">This document creates the "QUIC Alternative Address Types" registry under the
+"QUIC" registry group, following <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1" class="relref">Section 22.1</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. It covers 62-bit
+values, recorded in hexadecimal. Permanent registrations also include an Address
+Type Name field containing a short mnemonic.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<p id="section-9.3-2">The initial entries are:<a href="#section-9.3-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+          <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Address Type Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Specification</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x00</td>
+              <td class="text-left" rowspan="1" colspan="1">CURRENT_PATH</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x01</td>
+              <td class="text-left" rowspan="1" colspan="1">IPv4</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x02</td>
+              <td class="text-left" rowspan="1" colspan="1">IPv6</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
+</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-9.3-4">These entries are permanent, with IETF as Change Controller and quic@ietf.org
+as Contact. All other values are unassigned.<a href="#section-9.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec-combined-references">
-<section id="section-10">
-      <h2 id="name-references">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
-      </h2>
+</section>
+</div>
 <div id="sec-normative-references">
-<section id="section-10.1">
-        <h3 id="name-normative-references">
-<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
-        </h3>
-<dl class="references">
-<dt id="RFC2119">[RFC2119]</dt>
-        <dd>
-<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC8174">[RFC8174]</dt>
-        <dd>
-<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC9000">[RFC9000]</dt>
-      <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-</dl>
-</section>
-</div>
-<div id="sec-informative-references">
-<section id="section-10.2">
-        <h3 id="name-informative-references">
-<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
-        </h3>
+<section id="section-10">
+      <h2 id="name-normative-references">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      </h2>
 <dl class="references">
 <dt id="I-D.ietf-quic-multipath">[I-D.ietf-quic-multipath]</dt>
       <dd>
 <span class="refAuthor">Liu, Y.</span>, <span class="refAuthor">Ma, Y.</span>, <span class="refAuthor">De Coninck, Q.</span>, <span class="refAuthor">Bonaventure, O.</span>, <span class="refAuthor">Huitema, C.</span>, and <span class="refAuthor">M. Kühlewind</span>, <span class="refTitle">"Managing multiple paths for a QUIC connection"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-multipath-21</span>, <time datetime="2026-03-17" class="refDate">17 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-21">https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-21</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+      <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9000">[RFC9000]</dt>
+    <dd>
+<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 </dl>
-</section>
-</div>
 </section>
 </div>
 <div id="acknowledgments">

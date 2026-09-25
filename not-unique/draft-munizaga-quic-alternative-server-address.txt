@@ -5,7 +5,7 @@
 QUIC                                                         M. Munizaga
 Internet-Draft                                       Ethereum Foundation
 Intended status: Standards Track                              M. Seemann
-Expires: 24 March 2027                                 20 September 2026
+Expires: 29 March 2027                                 25 September 2026
 
 
                  QUIC Alternative Server Address Frames
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 March 2027.
+   This Internet-Draft will expire on 29 March 2027.
 
 Copyright Notice
 
@@ -83,9 +83,8 @@ Table of Contents
    9.  IANA Considerations
      9.1.  QUIC Transport Parameter
      9.2.  QUIC Frame Types
-   10. References
-     10.1.  Normative References
-     10.2.  Informative References
+     9.3.  QUIC Alternative Address Types
+   10. Normative References
    Acknowledgments
    Questions
    Authors' Addresses
@@ -122,11 +121,21 @@ Table of Contents
 
 3.  Negotiating Extension Use
 
-   Clients advertise their support of this extension by sending the
-   alternative_address (0xff0969d85c) transport parameter (Section 7.4
-   of [RFC9000]) with an empty value.  Sending this transport parameter
-   signals to the server that the client understands the
-   ALTERNATIVE_ADDRESS frame.
+   Clients advertise support for ALTERNATIVE_ADDRESS frames by sending
+   the alternative_address (0xff0969d85c) transport parameter
+   (Section 7.4 of [RFC9000]).  CURRENT_PATH, IPv4, and IPv6 are
+   implicitly supported.  The value is a possibly empty sequence of QUIC
+   variable-length integers (Section 16 of [RFC9000]) listing additional
+   supported Address Types, read to the end of the parameter value.
+   Values MUST be ordered and MUST NOT contain duplicates.
+
+   Servers MUST ignore unknown Address Types in the list and MUST treat
+   a truncated integer as a connection error of type
+   TRANSPORT_PARAMETER_ERROR.
+
+   Servers MUST NOT send ALTERNATIVE_ADDRESS frames without this
+   transport parameter or include Address Types that the client has not
+   explicitly or implicitly advertised.
 
    Servers MUST NOT send this transport parameter.  A client that
    supports this extension and receives this transport parameter MUST
@@ -152,20 +161,21 @@ Table of Contents
    path where it received the PATH_CHALLENGE, but prohibits the client
    from enforcing this requirement.  A matching PATH_RESPONSE received
    on any path validates the path on which the PATH_CHALLENGE was sent
-   (Section 8.2.3 of [RFC9000]).  The server might also send a
-   PATH_CHALLENGE to validate the path in its sending direction.
-   Consequently, while validating an advertised address, a client MUST
-   NOT discard a successfully authenticated probing packet solely
-   because it was received from an unadvertised server address.
-   Processing the packet does not validate its source address or make
-   that address eligible for migration.
+   (Section 8.2.3 of [RFC9000]).  The server MUST also validate the path
+   in its sending direction before sending non-probing packets on that
+   path, following Section 9.6.2 of [RFC9000].  Consequently, while
+   validating an advertised address, a client MUST NOT discard a
+   successfully authenticated probing packet solely because it was
+   received from an unadvertised server address.  Processing the packet
+   does not validate its source address or make that address eligible
+   for migration.
 
 5.  Alternative Address Frame
 
    A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete
-   set of alternative addresses and their priority relative to the
-   current path.  Each frame replaces the state established by any
-   previously processed ALTERNATIVE_ADDRESS frame.
+   set of alternative addresses and their priority hints.  Each frame
+   replaces the state established by any previously processed
+   ALTERNATIVE_ADDRESS frame.
 
    The frame uses the following format, following the conventions
    described in Section 12.4 of [RFC9000]:
@@ -179,20 +189,22 @@ Table of Contents
 
    The Entry Count field contains the number of Address Entries in the
    frame.  An Address Entry starts with a variable-length integer
-   Address Type and has one of the following formats:
+   Address Type (Section 9.3).  Except for CURRENT_PATH, each entry MUST
+   include a Priority Hint immediately after the Address Type.  This
+   document defines the following entry types:
 
    CURRENT_PATH Entry {
      Address Type (i) = 0x00,
    }
 
-   IPV4 Entry {
+   IPv4 Entry {
      Address Type (i) = 0x01,
      Priority Hint (i),
      IPv4 Address (32),
      IPv4 Port (16),
    }
 
-   IPV6 Entry {
+   IPv6 Entry {
      Address Type (i) = 0x02,
      Priority Hint (i),
      IPv6 Address (128),
@@ -208,19 +220,20 @@ Table of Contents
    entry; values on opposite sides are unrelated.  A server can assign
    the same value to every entry.
 
-   The CURRENT_PATH entry is a sentinel representing the server address
-   of the current path and carries no priority hint, address, or port.
-   A frame MUST contain exactly one CURRENT_PATH entry.  Receipt of a
-   frame that fails this requirement, does not order entries as
-   required, or contains an unknown Address Type MUST be treated as a
-   connection error of type FRAME_ENCODING_ERROR.
+   The CURRENT_PATH entry is a sentinel that separates the address
+   entries into two sets.  A frame MUST contain exactly one CURRENT_PATH
+   entry.  Receipt of a frame that fails this requirement, does not
+   order entries as required, or contains an unknown or unnegotiated
+   Address Type (Section 3) MUST be treated as a connection error of
+   type FRAME_ENCODING_ERROR.
 
-   IPV4 and IPV6 entries before CURRENT_PATH have higher priority than
-   the current path.  The client SHOULD promptly validate these
-   addresses and migrate to a validated address.  Entries after
-   CURRENT_PATH are backup addresses.  The client MAY validate paths to
-   these addresses, but SHOULD NOT migrate to one solely because it was
-   advertised.
+   When multipath has not been negotiated, entries before CURRENT_PATH
+   have higher priority than the current path.  The client SHOULD
+   promptly validate these addresses and migrate to a validated address.
+   Entries after CURRENT_PATH are backup addresses.  The client MAY
+   validate paths to these addresses, but SHOULD NOT migrate to one
+   solely because it was advertised.  The corresponding behavior when
+   multipath has been negotiated is described in Section 7.
 
    Priority hints are advisory.  A client MAY use them to decide which
    addresses to validate, which validations to perform in parallel, and
@@ -276,6 +289,17 @@ Table of Contents
    connection to use multiple paths simultaneously.  This extension
    complements that mechanism by allowing the server to advertise
    addresses for alternative paths.
+
+   When multipath has been negotiated, the client SHOULD promptly
+   establish paths to addresses in IPv4 and IPv6 entries before
+   CURRENT_PATH, as described in Section 3.1 of
+   [I-D.ietf-quic-multipath].  The endpoints' multipath scheduling and
+   path management determine how these paths are used and whether they
+   supplement or replace existing paths.
+
+   Entries after CURRENT_PATH remain backup addresses.  The client MAY
+   validate paths to these addresses, but SHOULD NOT start using them
+   for application data solely because they were advertised.
 
 8.  Security Considerations
 
@@ -334,9 +358,40 @@ Table of Contents
 
    Contact:  Marco Munizaga (marco@marcopolo.io)
 
-10.  References
+9.3.  QUIC Alternative Address Types
 
-10.1.  Normative References
+   This document creates the "QUIC Alternative Address Types" registry
+   under the "QUIC" registry group, following Section 22.1 of [RFC9000].
+   It covers 62-bit values, recorded in hexadecimal.  Permanent
+   registrations also include an Address Type Name field containing a
+   short mnemonic.
+
+   The initial entries are:
+
+               +=======+===================+===============+
+               | Value | Address Type Name | Specification |
+               +=======+===================+===============+
+               | 0x00  | CURRENT_PATH      | Section 5     |
+               +-------+-------------------+---------------+
+               | 0x01  | IPv4              | Section 5     |
+               +-------+-------------------+---------------+
+               | 0x02  | IPv6              | Section 5     |
+               +-------+-------------------+---------------+
+
+                                  Table 1
+
+   These entries are permanent, with IETF as Change Controller and
+   quic@ietf.org as Contact.  All other values are unassigned.
+
+10.  Normative References
+
+   [I-D.ietf-quic-multipath]
+              Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
+              C., and M. Kühlewind, "Managing multiple paths for a QUIC
+              connection", Work in Progress, Internet-Draft, draft-ietf-
+              quic-multipath-21, 17 March 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
+              multipath-21>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -351,16 +406,6 @@ Table of Contents
               Multiplexed and Secure Transport", RFC 9000,
               DOI 10.17487/RFC9000, May 2021,
               <https://www.rfc-editor.org/rfc/rfc9000>.
-
-10.2.  Informative References
-
-   [I-D.ietf-quic-multipath]
-              Liu, Y., Ma, Y., De Coninck, Q., Bonaventure, O., Huitema,
-              C., and M. Kühlewind, "Managing multiple paths for a QUIC
-              connection", Work in Progress, Internet-Draft, draft-ietf-
-              quic-multipath-21, 17 March 2026,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-quic-
-              multipath-21>.
 
 Acknowledgments
 
