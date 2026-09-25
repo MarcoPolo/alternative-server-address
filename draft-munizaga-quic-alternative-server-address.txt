@@ -222,8 +222,7 @@ Table of Contents
 
    The CURRENT_PATH entry is a sentinel that separates the address
    entries into two sets.  A frame MUST contain exactly one CURRENT_PATH
-   entry and MUST contain each IP address and port tuple at most once.
-   Receipt of a frame that fails either of these requirements, does not
+   entry.  Receipt of a frame that fails this requirement, does not
    order entries as required, or contains an unknown or unnegotiated
    Address Type (Section 3) MUST be treated as a connection error of
    type FRAME_ENCODING_ERROR.

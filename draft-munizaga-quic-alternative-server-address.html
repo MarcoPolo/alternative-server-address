@@ -1352,11 +1352,10 @@ values have meaning only relative to other values on the same side of the
 CURRENT_PATH entry; values on opposite sides are unrelated. A server can assign
 the same value to every entry.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7">The CURRENT_PATH entry is a sentinel that separates the address entries into two
-sets. A frame <span class="bcp14">MUST</span> contain exactly one CURRENT_PATH entry and <span class="bcp14">MUST</span> contain each
-IP address and port tuple at most once. Receipt of a frame that fails either of
-these requirements, does not order entries as required, or contains an unknown
-or unnegotiated Address Type (<a href="#negotiation" class="auto internal xref">Section 3</a>) <span class="bcp14">MUST</span> be treated as a connection
-error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
+sets. A frame <span class="bcp14">MUST</span> contain exactly one CURRENT_PATH entry. Receipt of a frame
+that fails this requirement, does not order entries as required, or contains an
+unknown or unnegotiated Address Type (<a href="#negotiation" class="auto internal xref">Section 3</a>) <span class="bcp14">MUST</span> be treated as a
+connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <p id="section-5-8">When multipath has not been negotiated, entries before CURRENT_PATH have higher
 priority than the current path. The client <span class="bcp14">SHOULD</span> promptly validate these
 addresses and migrate to a validated address. Entries after CURRENT_PATH are
