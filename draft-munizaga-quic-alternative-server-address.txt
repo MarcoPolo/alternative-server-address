@@ -5,7 +5,7 @@
 QUIC                                                         M. Munizaga
 Internet-Draft                                       Ethereum Foundation
 Intended status: Standards Track                              M. Seemann
-Expires: 28 March 2027                                 24 September 2026
+Expires: 29 March 2027                                 25 September 2026
 
 
                  QUIC Alternative Server Address Frames
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 March 2027.
+   This Internet-Draft will expire on 29 March 2027.
 
 Copyright Notice
 
@@ -83,6 +83,7 @@ Table of Contents
    9.  IANA Considerations
      9.1.  QUIC Transport Parameter
      9.2.  QUIC Frame Types
+     9.3.  QUIC Alternative Address Types
    10. Normative References
    Acknowledgments
    Questions
@@ -120,11 +121,21 @@ Table of Contents
 
 3.  Negotiating Extension Use
 
-   Clients advertise their support of this extension by sending the
-   alternative_address (0xff0969d85c) transport parameter (Section 7.4
-   of [RFC9000]) with an empty value.  Sending this transport parameter
-   signals to the server that the client understands the
-   ALTERNATIVE_ADDRESS frame.
+   Clients advertise support for ALTERNATIVE_ADDRESS frames by sending
+   the alternative_address (0xff0969d85c) transport parameter
+   (Section 7.4 of [RFC9000]).  CURRENT_PATH, IPv4, and IPv6 are
+   implicitly supported.  The value is a possibly empty sequence of QUIC
+   variable-length integers (Section 16 of [RFC9000]) listing additional
+   supported Address Types, read to the end of the parameter value.
+   Values MUST be ordered and MUST NOT contain duplicates.
+
+   Servers MUST ignore unknown Address Types in the list and MUST treat
+   a truncated integer as a connection error of type
+   TRANSPORT_PARAMETER_ERROR.
+
+   Servers MUST NOT send ALTERNATIVE_ADDRESS frames without this
+   transport parameter or include Address Types that the client has not
+   explicitly or implicitly advertised.
 
    Servers MUST NOT send this transport parameter.  A client that
    supports this extension and receives this transport parameter MUST
@@ -150,13 +161,14 @@ Table of Contents
    path where it received the PATH_CHALLENGE, but prohibits the client
    from enforcing this requirement.  A matching PATH_RESPONSE received
    on any path validates the path on which the PATH_CHALLENGE was sent
-   (Section 8.2.3 of [RFC9000]).  The server might also send a
-   PATH_CHALLENGE to validate the path in its sending direction.
-   Consequently, while validating an advertised address, a client MUST
-   NOT discard a successfully authenticated probing packet solely
-   because it was received from an unadvertised server address.
-   Processing the packet does not validate its source address or make
-   that address eligible for migration.
+   (Section 8.2.3 of [RFC9000]).  The server MUST also validate the path
+   in its sending direction before sending non-probing packets on that
+   path, following Section 9.6.2 of [RFC9000].  Consequently, while
+   validating an advertised address, a client MUST NOT discard a
+   successfully authenticated probing packet solely because it was
+   received from an unadvertised server address.  Processing the packet
+   does not validate its source address or make that address eligible
+   for migration.
 
 5.  Alternative Address Frame
 
@@ -177,20 +189,22 @@ Table of Contents
 
    The Entry Count field contains the number of Address Entries in the
    frame.  An Address Entry starts with a variable-length integer
-   Address Type and has one of the following formats:
+   Address Type (Section 9.3).  Except for CURRENT_PATH, each entry MUST
+   include a Priority Hint immediately after the Address Type.  This
+   document defines the following entry types:
 
    CURRENT_PATH Entry {
      Address Type (i) = 0x00,
    }
 
-   IPV4 Entry {
+   IPv4 Entry {
      Address Type (i) = 0x01,
      Priority Hint (i),
      IPv4 Address (32),
      IPv4 Port (16),
    }
 
-   IPV6 Entry {
+   IPv6 Entry {
      Address Type (i) = 0x02,
      Priority Hint (i),
      IPv6 Address (128),
@@ -210,8 +224,9 @@ Table of Contents
    entries into two sets.  A frame MUST contain exactly one CURRENT_PATH
    entry and MUST contain each IP address and port tuple at most once.
    Receipt of a frame that fails either of these requirements, does not
-   order entries as required, or contains an unknown Address Type MUST
-   be treated as a connection error of type FRAME_ENCODING_ERROR.
+   order entries as required, or contains an unknown or unnegotiated
+   Address Type (Section 3) MUST be treated as a connection error of
+   type FRAME_ENCODING_ERROR.
 
    When multipath has not been negotiated, entries before CURRENT_PATH
    have higher priority than the current path.  The client SHOULD
@@ -277,7 +292,7 @@ Table of Contents
    addresses for alternative paths.
 
    When multipath has been negotiated, the client SHOULD promptly
-   establish paths to addresses in IPV4 and IPV6 entries before
+   establish paths to addresses in IPv4 and IPv6 entries before
    CURRENT_PATH, as described in Section 3.1 of
    [I-D.ietf-quic-multipath].  The endpoints' multipath scheduling and
    path management determine how these paths are used and whether they
@@ -343,6 +358,31 @@ Table of Contents
    Change Controller:  IETF (iesg@ietf.org)
 
    Contact:  Marco Munizaga (marco@marcopolo.io)
+
+9.3.  QUIC Alternative Address Types
+
+   This document creates the "QUIC Alternative Address Types" registry
+   under the "QUIC" registry group, following Section 22.1 of [RFC9000].
+   It covers 62-bit values, recorded in hexadecimal.  Permanent
+   registrations also include an Address Type Name field containing a
+   short mnemonic.
+
+   The initial entries are:
+
+               +=======+===================+===============+
+               | Value | Address Type Name | Specification |
+               +=======+===================+===============+
+               | 0x00  | CURRENT_PATH      | Section 5     |
+               +-------+-------------------+---------------+
+               | 0x01  | IPv4              | Section 5     |
+               +-------+-------------------+---------------+
+               | 0x02  | IPv6              | Section 5     |
+               +-------+-------------------+---------------+
+
+                                  Table 1
+
+   These entries are permanent, with IETF as Change Controller and
+   quic@ietf.org as Contact.  All other values are unassigned.
 
 10.  Normative References
 

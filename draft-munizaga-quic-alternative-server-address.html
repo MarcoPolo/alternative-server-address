@@ -1049,7 +1049,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Munizaga &amp; Seemann</td>
-<td class="center">Expires 28 March 2027</td>
+<td class="center">Expires 29 March 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1062,12 +1062,12 @@ svg {
 <dd class="internet-draft">draft-munizaga-quic-alternative-server-address-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-09-24" class="published">24 September 2026</time>
+<time datetime="2026-09-25" class="published">25 September 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-03-28">28 March 2027</time></dd>
+<dd class="expires"><time datetime="2027-03-29">29 March 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1123,7 +1123,7 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 28 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 March 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1198,6 +1198,9 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
                 <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-quic-frame-types" class="internal xref">QUIC Frame Types</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-quic-alternative-address-ty" class="internal xref">QUIC Alternative Address Types</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
@@ -1248,19 +1251,25 @@ described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</s
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="negotiating-extension-use">
+<div id="negotiation">
 <section id="section-3">
       <h2 id="name-negotiating-extension-use">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-negotiating-extension-use" class="section-name selfRef">Negotiating Extension Use</a>
       </h2>
-<p id="section-3-1">Clients advertise their support of this extension by sending the
-alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) with an empty value. Sending this transport parameter signals
-to the server that the client understands the ALTERNATIVE_ADDRESS frame.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
+<p id="section-3-1">Clients advertise support for ALTERNATIVE_ADDRESS frames by sending the
+alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). CURRENT_PATH, IPv4, and IPv6 are implicitly supported. The value is
+a possibly empty sequence of QUIC variable-length integers (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) listing additional supported Address Types, read to the end of the
+parameter value. Values <span class="bcp14">MUST</span> be ordered and <span class="bcp14">MUST NOT</span> contain duplicates.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">Servers <span class="bcp14">MUST</span> ignore unknown Address Types in the list and <span class="bcp14">MUST</span> treat a truncated
+integer as a connection error of type TRANSPORT_PARAMETER_ERROR.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">Servers <span class="bcp14">MUST NOT</span> send ALTERNATIVE_ADDRESS frames without this transport
+parameter or include Address Types that the client has not explicitly or
+implicitly advertised.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
 extension and receives this transport parameter <span class="bcp14">MUST</span> abort the connection with a
-TRANSPORT_PARAMETER_ERROR.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">A server <span class="bcp14">MUST NOT</span> remember a client's use of this transport parameter for 0-RTT
-in a subsequent connection.<a href="#section-3-3" class="pilcrow">¶</a></p>
+TRANSPORT_PARAMETER_ERROR.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-3-5">A server <span class="bcp14">MUST NOT</span> remember a client's use of this transport parameter for 0-RTT
+in a subsequent connection.<a href="#section-3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="path-validation">
@@ -1280,8 +1289,9 @@ address other than the address being validated. <span><a href="https://rfc-edito
 requires the server to send the PATH_RESPONSE on the path where it received the
 PATH_CHALLENGE, but prohibits the client from enforcing this requirement. A
 matching PATH_RESPONSE received on any path validates the path on which the
-PATH_CHALLENGE was sent (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-8.2.3" class="relref">Section 8.2.3</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). The server might also
-send a PATH_CHALLENGE to validate the path in its sending direction.
+PATH_CHALLENGE was sent (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-8.2.3" class="relref">Section 8.2.3</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). The server <span class="bcp14">MUST</span> also
+validate the path in its sending direction before sending non-probing packets
+on that path, following <span><a href="https://rfc-editor.org/rfc/rfc9000#section-9.6.2" class="relref">Section 9.6.2</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>.
 Consequently, while validating an advertised address, a client <span class="bcp14">MUST NOT</span> discard
 a successfully authenticated probing packet solely because it was received from
 an unadvertised server address. Processing the packet does not validate its
@@ -1309,22 +1319,24 @@ ALTERNATIVE_ADDRESS Frame {
 </pre><a href="#section-5-3" class="pilcrow">¶</a>
 </div>
 <p id="section-5-4">The Entry Count field contains the number of Address Entries in the frame.
-An Address Entry starts with a variable-length integer Address Type and has one
-of the following formats:<a href="#section-5-4" class="pilcrow">¶</a></p>
+An Address Entry starts with a variable-length integer Address Type
+(<a href="#iana-address-types" class="auto internal xref">Section 9.3</a>). Except for CURRENT_PATH, each entry <span class="bcp14">MUST</span> include a
+Priority Hint immediately after the Address Type. This document defines the
+following entry types:<a href="#section-5-4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-5">
 <pre>
 CURRENT_PATH Entry {
   Address Type (i) = 0x00,
 }
 
-IPV4 Entry {
+IPv4 Entry {
   Address Type (i) = 0x01,
   Priority Hint (i),
   IPv4 Address (32),
   IPv4 Port (16),
 }
 
-IPV6 Entry {
+IPv6 Entry {
   Address Type (i) = 0x02,
   Priority Hint (i),
   IPv6 Address (128),
@@ -1343,7 +1355,8 @@ the same value to every entry.<a href="#section-5-6" class="pilcrow">¶</a></p>
 sets. A frame <span class="bcp14">MUST</span> contain exactly one CURRENT_PATH entry and <span class="bcp14">MUST</span> contain each
 IP address and port tuple at most once. Receipt of a frame that fails either of
 these requirements, does not order entries as required, or contains an unknown
-Address Type <span class="bcp14">MUST</span> be treated as a connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
+or unnegotiated Address Type (<a href="#negotiation" class="auto internal xref">Section 3</a>) <span class="bcp14">MUST</span> be treated as a connection
+error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
 <p id="section-5-8">When multipath has not been negotiated, entries before CURRENT_PATH have higher
 priority than the current path. The client <span class="bcp14">SHOULD</span> promptly validate these
 addresses and migrate to a validated address. Entries after CURRENT_PATH are
@@ -1404,7 +1417,7 @@ that the server has enough connection IDs to probe new paths.<a href="#section-6
 to use multiple paths simultaneously. This extension complements that mechanism
 by allowing the server to advertise addresses for alternative paths.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">When multipath has been negotiated, the client <span class="bcp14">SHOULD</span> promptly establish paths
-to addresses in IPV4 and IPV6 entries before CURRENT_PATH, as described in
+to addresses in IPv4 and IPv6 entries before CURRENT_PATH, as described in
 <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-quic-multipath-21#section-3.1" class="relref">Section 3.1</a> of [<a href="#I-D.ietf-quic-multipath" class="cite xref">I-D.ietf-quic-multipath</a>]</span>. The endpoints' multipath scheduling
 and path management determine how these paths are used and whether they
 supplement or replace existing paths.<a href="#section-7-2" class="pilcrow">¶</a></p>
@@ -1529,6 +1542,53 @@ new value that encodes in two bytes)<a href="#section-9.2-2.6.1" class="pilcrow"
 </dd>
         <dd class="break"></dd>
 </dl>
+</section>
+</div>
+<div id="iana-address-types">
+<section id="section-9.3">
+        <h3 id="name-quic-alternative-address-ty">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-quic-alternative-address-ty" class="section-name selfRef">QUIC Alternative Address Types</a>
+        </h3>
+<p id="section-9.3-1">This document creates the "QUIC Alternative Address Types" registry under the
+"QUIC" registry group, following <span><a href="https://rfc-editor.org/rfc/rfc9000#section-22.1" class="relref">Section 22.1</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>. It covers 62-bit
+values, recorded in hexadecimal. Permanent registrations also include an Address
+Type Name field containing a short mnemonic.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<p id="section-9.3-2">The initial entries are:<a href="#section-9.3-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+          <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Address Type Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Specification</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x00</td>
+              <td class="text-left" rowspan="1" colspan="1">CURRENT_PATH</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x01</td>
+              <td class="text-left" rowspan="1" colspan="1">IPv4</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
+</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x02</td>
+              <td class="text-left" rowspan="1" colspan="1">IPv6</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <a href="#alternative-address-frame" class="auto internal xref">Section 5</a>
+</td>
+            </tr>
+          </tbody>
+        </table>
+<p id="section-9.3-4">These entries are permanent, with IETF as Change Controller and quic@ietf.org
+as Contact. All other values are unassigned.<a href="#section-9.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
