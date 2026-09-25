@@ -1210,10 +1210,7 @@ changes.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-questions" class="internal xref">Questions</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1259,17 +1256,17 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-3-1">Clients advertise support for ALTERNATIVE_ADDRESS frames by sending the
 alternative_address (0xff0969d85c) transport parameter (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-7.4" class="relref">Section 7.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>). CURRENT_PATH, IPv4, and IPv6 are implicitly supported. The value is
 a possibly empty sequence of QUIC variable-length integers (<span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>) listing additional supported Address Types, read to the end of the
-parameter value. Values <span class="bcp14">MUST</span> be ordered and <span class="bcp14">MUST NOT</span> contain duplicates.<a href="#section-3-1" class="pilcrow">¶</a></p>
+parameter value. Values <span class="bcp14">MUST</span> be in strictly increasing order and <span class="bcp14">MUST NOT</span>
+contain duplicates.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">Servers <span class="bcp14">MUST</span> ignore unknown Address Types in the list and <span class="bcp14">MUST</span> treat a truncated
 integer as a connection error of type TRANSPORT_PARAMETER_ERROR.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">Servers <span class="bcp14">MUST NOT</span> send ALTERNATIVE_ADDRESS frames without this transport
-parameter or include Address Types that the client has not explicitly or
-implicitly advertised.<a href="#section-3-3" class="pilcrow">¶</a></p>
+parameter or include Address Types not supported by the client.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">Servers <span class="bcp14">MUST NOT</span> send this transport parameter. A client that supports this
 extension and receives this transport parameter <span class="bcp14">MUST</span> abort the connection with a
 TRANSPORT_PARAMETER_ERROR.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<p id="section-3-5">A server <span class="bcp14">MUST NOT</span> remember a client's use of this transport parameter for 0-RTT
-in a subsequent connection.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<p id="section-3-5">A server <span class="bcp14">MUST NOT</span> remember this transport parameter for 0-RTT in a subsequent
+connection.<a href="#section-3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="path-validation">
@@ -1304,8 +1301,8 @@ source address or make that address eligible for migration.<a href="#section-4-2
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-alternative-address-frame" class="section-name selfRef">Alternative Address Frame</a>
       </h2>
 <p id="section-5-1">A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete set of
-alternative addresses and their priority hints. Each frame replaces the state
-established by any previously processed ALTERNATIVE_ADDRESS frame.<a href="#section-5-1" class="pilcrow">¶</a></p>
+alternative addresses and their priority hints. Frames with higher Sequence
+Numbers supersede those with lower Sequence Numbers.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">The frame uses the following format, following the conventions described in
 <span><a href="https://rfc-editor.org/rfc/rfc9000#section-12.4" class="relref">Section 12.4</a> of [<a href="#RFC9000" class="cite xref">RFC9000</a>]</span>:<a href="#section-5-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-5-3">
@@ -1344,35 +1341,38 @@ IPv6 Entry {
 }
 </pre><a href="#section-5-5" class="pilcrow">¶</a>
 </div>
-<p id="section-5-6">The Priority Hint field is a QUIC variable-length integer. On each side of the
-CURRENT_PATH entry, lower values indicate higher priority and entries with the
-same value form a priority group in which the server expresses no preference.
-Entries on each side <span class="bcp14">MUST</span> appear in ascending Priority Hint order. Priority Hint
-values have meaning only relative to other values on the same side of the
-CURRENT_PATH entry; values on opposite sides are unrelated. A server can assign
-the same value to every entry.<a href="#section-5-6" class="pilcrow">¶</a></p>
-<p id="section-5-7">The CURRENT_PATH entry is a sentinel that separates the address entries into two
-sets. A frame <span class="bcp14">MUST</span> contain exactly one CURRENT_PATH entry. Receipt of a frame
-that fails this requirement, does not order entries as required, or contains an
-unknown or unnegotiated Address Type (<a href="#negotiation" class="auto internal xref">Section 3</a>) <span class="bcp14">MUST</span> be treated as a
-connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-7" class="pilcrow">¶</a></p>
-<p id="section-5-8">When multipath has not been negotiated, entries before CURRENT_PATH have higher
+<p id="section-5-6">The CURRENT_PATH entry is a sentinel that separates the address entries into two
+sets.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<p id="section-5-7">When multipath has not been negotiated, entries before CURRENT_PATH have higher
 priority than the current path. The client <span class="bcp14">SHOULD</span> promptly validate these
 addresses and migrate to a validated address. Entries after CURRENT_PATH are
 backup addresses. The client <span class="bcp14">MAY</span> validate paths to these addresses, but <span class="bcp14">SHOULD NOT</span> migrate to one solely because it was advertised. The corresponding behavior
-when multipath has been negotiated is described in <a href="#multipath" class="auto internal xref">Section 7</a>.<a href="#section-5-8" class="pilcrow">¶</a></p>
-<p id="section-5-9">Priority hints are advisory. A client <span class="bcp14">MAY</span> use them to decide which addresses to
+when multipath has been negotiated is described in <a href="#multipath" class="auto internal xref">Section 7</a>.<a href="#section-5-7" class="pilcrow">¶</a></p>
+<p id="section-5-8">The Priority Hint field is a QUIC variable-length integer. On each side of the
+CURRENT_PATH entry, lower values indicate higher priority and entries with the
+same value form a priority group in which the server expresses no preference.
+Entries on each side <span class="bcp14">MUST</span> appear in nondecreasing Priority Hint order. Priority
+Hint values have meaning only relative to other values on the same side of the
+CURRENT_PATH entry; values on opposite sides are unrelated. A server can assign
+the same value to every entry.<a href="#section-5-8" class="pilcrow">¶</a></p>
+<p id="section-5-9">A frame <span class="bcp14">MUST</span> contain exactly one CURRENT_PATH entry. Receipt of a frame that
+fails this requirement, does not order entries as required, or contains an
+unknown or unnegotiated Address Type (<a href="#negotiation" class="auto internal xref">Section 3</a>) <span class="bcp14">MUST</span> be treated as a
+connection error of type FRAME_ENCODING_ERROR.<a href="#section-5-9" class="pilcrow">¶</a></p>
+<p id="section-5-10">Priority hints are advisory. A client <span class="bcp14">MAY</span> use them to decide which addresses to
 validate, which validations to perform in parallel, and which validated address
-to use. A client <span class="bcp14">MAY</span> disregard priority hints based on local policy.<a href="#section-5-9" class="pilcrow">¶</a></p>
-<p id="section-5-10">A server <span class="bcp14">MUST</span> use a larger Sequence Number for each address-set update. A client
-<span class="bcp14">MUST</span> ignore an ALTERNATIVE_ADDRESS frame whose Sequence Number is not greater
-than that of the most recently processed ALTERNATIVE_ADDRESS frame.
-Therefore, a newer frame atomically replaces an older address set even if the
-frames are received out of order. An address omitted from the newer frame is no
-longer advertised by this extension. The client <span class="bcp14">SHOULD</span> stop probing or using a
-non-current path associated with an address that is no longer advertised.<a href="#section-5-10" class="pilcrow">¶</a></p>
-<p id="section-5-11">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> be sent only in the
-application data packet number space.<a href="#section-5-11" class="pilcrow">¶</a></p>
+to use. A client <span class="bcp14">MAY</span> disregard priority hints based on local policy.<a href="#section-5-10" class="pilcrow">¶</a></p>
+<p id="section-5-11">A server <span class="bcp14">MUST</span> increment the Sequence Number on each ALTERNATIVE_ADDRESS frame it
+sends. A client <span class="bcp14">MUST</span> ignore an ALTERNATIVE_ADDRESS frame whose Sequence Number
+is not greater than that of the most recently processed ALTERNATIVE_ADDRESS
+frame. Therefore, a newer frame atomically replaces an older address set even if
+the frames are received out of order. An address omitted from the newer frame is
+no longer advertised by this extension. The client <span class="bcp14">SHOULD</span> stop probing or using
+a non-current path associated with an address that is no longer advertised.<a href="#section-5-11" class="pilcrow">¶</a></p>
+<p id="section-5-12">ALTERNATIVE_ADDRESS frames are ack-eliciting and <span class="bcp14">MUST</span> be sent only in the
+application data packet number space. Clients <span class="bcp14">MUST NOT</span> send ALTERNATIVE_ADDRESS
+frames. A server <span class="bcp14">MUST</span> treat receipt of an ALTERNATIVE_ADDRESS frame as a
+connection error of type PROTOCOL_VIOLATION.<a href="#section-5-12" class="pilcrow">¶</a></p>
 <div id="address-selection-and-reachability">
 <section id="section-5.1">
         <h3 id="name-address-selection-and-reach">
@@ -1387,7 +1387,7 @@ and <span class="bcp14">SHOULD</span> update the set when it learns that an addr
 unicast addresses, and other addresses with limited scope. A client <span class="bcp14">MAY</span> decline
 to probe an address according to local policy. A client <span class="bcp14">MUST</span> successfully
 validate a path before sending non-probing frames on it. The request forgery
-considerations in Sections 21.5.3 and 21.5.6 of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> apply.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+considerations in Sections <a href="https://rfc-editor.org/rfc/rfc9000#section-21.5.3" class="relref">21.5.3</a> and <a href="https://rfc-editor.org/rfc/rfc9000#section-21.5.6" class="relref">21.5.6</a> of <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span> apply.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1625,21 +1625,8 @@ as Contact. All other values are unassigned.<a href="#section-9.3-4" class="pilc
 <p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="questions">
-<section id="appendix-B">
-      <h2 id="name-questions">
-<a href="#name-questions" class="section-name selfRef">Questions</a>
-      </h2>
-<ul class="normal">
-<li class="normal" id="appendix-B-1.1">
-          <p id="appendix-B-1.1.1">Any new security considerations from allowing a dynamically chosen preferred
-address?<a href="#appendix-B-1.1.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
-</section>
-</div>
 <div id="authors-addresses">
-<section id="appendix-C">
+<section id="appendix-B">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>

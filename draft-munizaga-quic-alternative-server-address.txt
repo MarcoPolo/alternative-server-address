@@ -86,7 +86,6 @@ Table of Contents
      9.3.  QUIC Alternative Address Types
    10. Normative References
    Acknowledgments
-   Questions
    Authors' Addresses
 
 1.  Introduction
@@ -127,22 +126,23 @@ Table of Contents
    implicitly supported.  The value is a possibly empty sequence of QUIC
    variable-length integers (Section 16 of [RFC9000]) listing additional
    supported Address Types, read to the end of the parameter value.
-   Values MUST be ordered and MUST NOT contain duplicates.
+   Values MUST be in strictly increasing order and MUST NOT contain
+   duplicates.
 
    Servers MUST ignore unknown Address Types in the list and MUST treat
    a truncated integer as a connection error of type
    TRANSPORT_PARAMETER_ERROR.
 
    Servers MUST NOT send ALTERNATIVE_ADDRESS frames without this
-   transport parameter or include Address Types that the client has not
-   explicitly or implicitly advertised.
+   transport parameter or include Address Types not supported by the
+   client.
 
    Servers MUST NOT send this transport parameter.  A client that
    supports this extension and receives this transport parameter MUST
    abort the connection with a TRANSPORT_PARAMETER_ERROR.
 
-   A server MUST NOT remember a client's use of this transport parameter
-   for 0-RTT in a subsequent connection.
+   A server MUST NOT remember this transport parameter for 0-RTT in a
+   subsequent connection.
 
 4.  Path Validation
 
@@ -173,9 +173,8 @@ Table of Contents
 5.  Alternative Address Frame
 
    A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete
-   set of alternative addresses and their priority hints.  Each frame
-   replaces the state established by any previously processed
-   ALTERNATIVE_ADDRESS frame.
+   set of alternative addresses and their priority hints.  Frames with
+   higher Sequence Numbers supersede those with lower Sequence Numbers.
 
    The frame uses the following format, following the conventions
    described in Section 12.4 of [RFC9000]:
@@ -211,21 +210,8 @@ Table of Contents
      IPv6 Port (16),
    }
 
-   The Priority Hint field is a QUIC variable-length integer.  On each
-   side of the CURRENT_PATH entry, lower values indicate higher priority
-   and entries with the same value form a priority group in which the
-   server expresses no preference.  Entries on each side MUST appear in
-   ascending Priority Hint order.  Priority Hint values have meaning
-   only relative to other values on the same side of the CURRENT_PATH
-   entry; values on opposite sides are unrelated.  A server can assign
-   the same value to every entry.
-
    The CURRENT_PATH entry is a sentinel that separates the address
-   entries into two sets.  A frame MUST contain exactly one CURRENT_PATH
-   entry.  Receipt of a frame that fails this requirement, does not
-   order entries as required, or contains an unknown or unnegotiated
-   Address Type (Section 3) MUST be treated as a connection error of
-   type FRAME_ENCODING_ERROR.
+   entries into two sets.
 
    When multipath has not been negotiated, entries before CURRENT_PATH
    have higher priority than the current path.  The client SHOULD
@@ -235,23 +221,41 @@ Table of Contents
    solely because it was advertised.  The corresponding behavior when
    multipath has been negotiated is described in Section 7.
 
+   The Priority Hint field is a QUIC variable-length integer.  On each
+   side of the CURRENT_PATH entry, lower values indicate higher priority
+   and entries with the same value form a priority group in which the
+   server expresses no preference.  Entries on each side MUST appear in
+   nondecreasing Priority Hint order.  Priority Hint values have meaning
+   only relative to other values on the same side of the CURRENT_PATH
+   entry; values on opposite sides are unrelated.  A server can assign
+   the same value to every entry.
+
+   A frame MUST contain exactly one CURRENT_PATH entry.  Receipt of a
+   frame that fails this requirement, does not order entries as
+   required, or contains an unknown or unnegotiated Address Type
+   (Section 3) MUST be treated as a connection error of type
+   FRAME_ENCODING_ERROR.
+
    Priority hints are advisory.  A client MAY use them to decide which
    addresses to validate, which validations to perform in parallel, and
    which validated address to use.  A client MAY disregard priority
    hints based on local policy.
 
-   A server MUST use a larger Sequence Number for each address-set
-   update.  A client MUST ignore an ALTERNATIVE_ADDRESS frame whose
-   Sequence Number is not greater than that of the most recently
-   processed ALTERNATIVE_ADDRESS frame.  Therefore, a newer frame
-   atomically replaces an older address set even if the frames are
-   received out of order.  An address omitted from the newer frame is no
-   longer advertised by this extension.  The client SHOULD stop probing
-   or using a non-current path associated with an address that is no
-   longer advertised.
+   A server MUST increment the Sequence Number on each
+   ALTERNATIVE_ADDRESS frame it sends.  A client MUST ignore an
+   ALTERNATIVE_ADDRESS frame whose Sequence Number is not greater than
+   that of the most recently processed ALTERNATIVE_ADDRESS frame.
+   Therefore, a newer frame atomically replaces an older address set
+   even if the frames are received out of order.  An address omitted
+   from the newer frame is no longer advertised by this extension.  The
+   client SHOULD stop probing or using a non-current path associated
+   with an address that is no longer advertised.
 
    ALTERNATIVE_ADDRESS frames are ack-eliciting and MUST be sent only in
-   the application data packet number space.
+   the application data packet number space.  Clients MUST NOT send
+   ALTERNATIVE_ADDRESS frames.  A server MUST treat receipt of an
+   ALTERNATIVE_ADDRESS frame as a connection error of type
+   PROTOCOL_VIOLATION.
 
 5.1.  Address Selection and Reachability
 
@@ -410,11 +414,6 @@ Table of Contents
 Acknowledgments
 
    TODO acknowledge.
-
-Questions
-
-   *  Any new security considerations from allowing a dynamically chosen
-      preferred address?
 
 Authors' Addresses
 
