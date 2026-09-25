@@ -164,11 +164,10 @@ CURRENT_PATH entry; values on opposite sides are unrelated. A server can assign
 the same value to every entry.
 
 The CURRENT_PATH entry is a sentinel that separates the address entries into two
-sets. A frame MUST contain exactly one CURRENT_PATH entry and MUST contain each
-IP address and port tuple at most once. Receipt of a frame that fails either of
-these requirements, does not order entries as required, or contains an unknown
-or unnegotiated Address Type ({{negotiation}}) MUST be treated as a connection
-error of type FRAME_ENCODING_ERROR.
+sets. A frame MUST contain exactly one CURRENT_PATH entry. Receipt of a frame
+that fails this requirement, does not order entries as required, or contains an
+unknown or unnegotiated Address Type ({{negotiation}}) MUST be treated as a
+connection error of type FRAME_ENCODING_ERROR.
 
 When multipath has not been negotiated, entries before CURRENT_PATH have higher
 priority than the current path. The client SHOULD promptly validate these
