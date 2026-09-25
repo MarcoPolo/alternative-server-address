@@ -69,7 +69,7 @@ out of scope of this document.
 
 Clients advertise support for ALTERNATIVE_ADDRESS frames by sending the
 alternative_address (0xff0969d85c) transport parameter ({{Section 7.4 of
-RFC9000}}). CURRENT_PATH, IPV4, and IPV6 are implicitly supported. The value is
+RFC9000}}). CURRENT_PATH, IPv4, and IPv6 are implicitly supported. The value is
 a possibly empty sequence of QUIC variable-length integers ({{Section 16 of
 RFC9000}}) listing additional supported Address Types, read to the end of the
 parameter value. Values MUST be ordered and MUST NOT contain duplicates.
@@ -139,14 +139,14 @@ CURRENT_PATH Entry {
   Address Type (i) = 0x00,
 }
 
-IPV4 Entry {
+IPv4 Entry {
   Address Type (i) = 0x01,
   Priority Hint (i),
   IPv4 Address (32),
   IPv4 Port (16),
 }
 
-IPV6 Entry {
+IPv6 Entry {
   Address Type (i) = 0x02,
   Priority Hint (i),
   IPv6 Address (128),
@@ -224,7 +224,7 @@ to use multiple paths simultaneously. This extension complements that mechanism
 by allowing the server to advertise addresses for alternative paths.
 
 When multipath has been negotiated, the client SHOULD promptly establish paths
-to addresses in IPV4 and IPV6 entries before CURRENT_PATH, as described in
+to addresses in IPv4 and IPv6 entries before CURRENT_PATH, as described in
 {{Section 3.1 of I-D.ietf-quic-multipath}}. The endpoints' multipath scheduling
 and path management determine how these paths are used and whether they
 supplement or replace existing paths.
@@ -313,8 +313,8 @@ The initial entries are:
 | Value | Address Type Name | Specification |
 |:------|:------------------|:--------------|
 | 0x00 | CURRENT_PATH | {{alternative-address-frame}} |
-| 0x01 | IPV4 | {{alternative-address-frame}} |
-| 0x02 | IPV6 | {{alternative-address-frame}} |
+| 0x01 | IPv4 | {{alternative-address-frame}} |
+| 0x02 | IPv6 | {{alternative-address-frame}} |
 
 These entries are permanent, with IETF as Change Controller and quic@ietf.org
 as Contact. All other values are unassigned.
