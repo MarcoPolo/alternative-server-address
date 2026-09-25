@@ -103,8 +103,9 @@ address other than the address being validated. {{Section 8.2.2 of RFC9000}}
 requires the server to send the PATH_RESPONSE on the path where it received the
 PATH_CHALLENGE, but prohibits the client from enforcing this requirement. A
 matching PATH_RESPONSE received on any path validates the path on which the
-PATH_CHALLENGE was sent ({{Section 8.2.3 of RFC9000}}). The server might also
-send a PATH_CHALLENGE to validate the path in its sending direction.
+PATH_CHALLENGE was sent ({{Section 8.2.3 of RFC9000}}). The server MUST also
+validate the path in its sending direction before sending non-probing packets
+on that path, following {{Section 9.6.2 of RFC9000}}.
 Consequently, while validating an advertised address, a client MUST NOT discard
 a successfully authenticated probing packet solely because it was received from
 an unadvertised server address. Processing the packet does not validate its
