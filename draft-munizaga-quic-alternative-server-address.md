@@ -65,12 +65,21 @@ out of scope of this document.
 
 {::boilerplate bcp14-tagged}
 
-# Negotiating Extension Use
+# Negotiating Extension Use {#negotiation}
 
-Clients advertise their support of this extension by sending the
+Clients advertise support for ALTERNATIVE_ADDRESS frames by sending the
 alternative_address (0xff0969d85c) transport parameter ({{Section 7.4 of
-RFC9000}}) with an empty value. Sending this transport parameter signals
-to the server that the client understands the ALTERNATIVE_ADDRESS frame.
+RFC9000}}). CURRENT_PATH, IPV4, and IPV6 are implicitly supported. The value is
+a possibly empty sequence of QUIC variable-length integers ({{Section 16 of
+RFC9000}}) listing additional supported Address Types, read to the end of the
+parameter value. Values MUST be ordered and MUST NOT contain duplicates.
+
+Servers MUST ignore unknown Address Types in the list and MUST treat a truncated
+integer as a connection error of type TRANSPORT_PARAMETER_ERROR.
+
+Servers MUST NOT send ALTERNATIVE_ADDRESS frames without this transport
+parameter or include Address Types that the client has not explicitly or
+implicitly advertised.
 
 Servers MUST NOT send this transport parameter. A client that supports this
 extension and receives this transport parameter MUST abort the connection with a
@@ -101,7 +110,7 @@ a successfully authenticated probing packet solely because it was received from
 an unadvertised server address. Processing the packet does not validate its
 source address or make that address eligible for migration.
 
-# Alternative Address Frame
+# Alternative Address Frame {#alternative-address-frame}
 
 A server uses an ALTERNATIVE_ADDRESS frame to advertise its complete set of
 alternative addresses and their priority hints. Each frame replaces the state
@@ -120,8 +129,10 @@ ALTERNATIVE_ADDRESS Frame {
 ~~~
 
 The Entry Count field contains the number of Address Entries in the frame.
-An Address Entry starts with a variable-length integer Address Type and has one
-of the following formats:
+An Address Entry starts with a variable-length integer Address Type
+({{iana-address-types}}). Except for CURRENT_PATH, each entry MUST include a
+Priority Hint immediately after the Address Type. This document defines the
+following entry types:
 
 ~~~
 CURRENT_PATH Entry {
@@ -155,7 +166,8 @@ The CURRENT_PATH entry is a sentinel that separates the address entries into two
 sets. A frame MUST contain exactly one CURRENT_PATH entry and MUST contain each
 IP address and port tuple at most once. Receipt of a frame that fails either of
 these requirements, does not order entries as required, or contains an unknown
-Address Type MUST be treated as a connection error of type FRAME_ENCODING_ERROR.
+or unnegotiated Address Type ({{negotiation}}) MUST be treated as a connection
+error of type FRAME_ENCODING_ERROR.
 
 When multipath has not been negotiated, entries before CURRENT_PATH have higher
 priority than the current path. The client SHOULD promptly validate these
@@ -288,6 +300,24 @@ Change Controller:
 
 Contact:
 : Marco Munizaga (marco@marcopolo.io)
+
+## QUIC Alternative Address Types {#iana-address-types}
+
+This document creates the "QUIC Alternative Address Types" registry under the
+"QUIC" registry group, following {{Section 22.1 of RFC9000}}. It covers 62-bit
+values, recorded in hexadecimal. Permanent registrations also include an Address
+Type Name field containing a short mnemonic.
+
+The initial entries are:
+
+| Value | Address Type Name | Specification |
+|:------|:------------------|:--------------|
+| 0x00 | CURRENT_PATH | {{alternative-address-frame}} |
+| 0x01 | IPV4 | {{alternative-address-frame}} |
+| 0x02 | IPV6 | {{alternative-address-frame}} |
+
+These entries are permanent, with IETF as Change Controller and quic@ietf.org
+as Contact. All other values are unassigned.
 
 --- back
 
